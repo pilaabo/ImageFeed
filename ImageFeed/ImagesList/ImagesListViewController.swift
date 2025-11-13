@@ -27,11 +27,14 @@ extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         guard let image = UIImage(named: photosNames[indexPath.row]) else { return }
         
-        cell.cellImage?.image = image
-        cell.dateLabel?.text = dateFormatter.string(from: Date())
+        cell.setImage(image)
+        cell.setDate(Date())
         
-        let likeState = indexPath.row.isMultiple(of: 2) ? "Liked" : "Not Liked"
-        cell.likeButton?.setImage(UIImage(named: likeState), for: .normal)
+        let likeImage = indexPath.row % 2 == 0
+            ? UIImage(named: "Liked")
+            : UIImage(named: "Not Liked")
+        
+        cell.setLike(likeImage)
     }
 }
 
