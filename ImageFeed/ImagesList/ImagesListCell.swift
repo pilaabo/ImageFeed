@@ -52,10 +52,7 @@ class ImagesListCell: UITableViewCell {
     // MARK: - Private Methods
     
     private func setupGradient() {
-        let transparent = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 0).cgColor
-        let opaque = UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 1).cgColor
-        
-        gradientLayer.colors = [transparent, opaque]
+        gradientLayer.colors = [UIColor.transparent, UIColor.opaque]
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         gradientLayer.endPoint   = CGPoint(x: 0.5, y: 1.0)
