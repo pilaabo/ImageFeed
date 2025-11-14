@@ -1,6 +1,6 @@
 import UIKit
 
-class ImagesListCell: UITableViewCell {
+final class ImagesListCell: UITableViewCell {
     
     // MARK: - Reuse Identifier
     
@@ -26,26 +26,31 @@ class ImagesListCell: UITableViewCell {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        guard let gradientView else { return }
+        guard let gradientView else {
+            return
+        }
         gradientLayer.frame = gradientView.bounds
     }
     
     // MARK: - Public Configuration Methods
     
     func setImage(_ image: UIImage?) {
-        guard let image else { return }
+        guard let image else {
+            return
+        }
         cellImage?.image = image
     }
     
     func setDate(_ date: Date) {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "d MMMM yyyy"
         dateLabel?.text = formatter.string(from: date)
     }
     
     func setLike(_ likeImage: UIImage?) {
-        guard let likeImage else { return }
+        guard let likeImage else {
+            return
+        }
         likeButton?.setImage(likeImage, for: .normal)
     }
     

@@ -1,15 +1,18 @@
 import UIKit
 
-class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController {
+    // MARK: - Outlets
+
     @IBOutlet private weak var tableView: UITableView?
     
+    // MARK: - Properties
+
     private let photosNames = Array(0..<20).map { "\($0)" }
     
     // MARK: - Date Formatter
     
     private var dateFormatter: DateFormatter {
         let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ru_RU")
         formatter.dateFormat = "d MMMM yyyy"
         return formatter
     }
@@ -25,7 +28,9 @@ class ImagesListViewController: UIViewController {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let image = UIImage(named: photosNames[indexPath.row]) else { return }
+        guard let image = UIImage(named: photosNames[indexPath.row]) else {
+            return
+        }
         
         cell.setImage(image)
         cell.setDate(Date())
@@ -58,14 +63,22 @@ extension ImagesListViewController: UITableViewDataSource {
 // MARK: - UITableViewDelegate
 
 extension ImagesListViewController: UITableViewDelegate {
-    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) { }
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // TODO: Показывать картинку во весь экран по нажатию на ячейку
+    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let image = UIImage(named: photosNames[indexPath.row]) else { return 0 }
+        guard let image = UIImage(named: photosNames[indexPath.row]) else {
+            return 0
+        }
         
         let imageWidth = image.size.width
         let imageHeight = image.size.height
         let tableWidth = tableView.bounds.width
+        
+        guard imageWidth > 0 else {
+            return 0
+        }
         
         let scaledHeight = imageHeight * (tableWidth / imageWidth)
         
