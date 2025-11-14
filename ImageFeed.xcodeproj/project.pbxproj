@@ -7,11 +7,11 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		E75C1E452EB7AD1400947D37 /* ImageFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		E79FB9AC2EBA21BC00E4E049 /* ImageFeed.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ImageFeed.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
-		E75C1E572EB7AD1600947D37 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */ = {
+		E75C1E892EB8425E00947D37 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				Info.plist,
@@ -21,10 +21,10 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		E75C1E472EB7AD1400947D37 /* ImageFeed */ = {
+		E75C1E822EB8425E00947D37 /* ImageFeed */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
-				E75C1E572EB7AD1600947D37 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */,
+				E75C1E892EB8425E00947D37 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */,
 			);
 			path = ImageFeed;
 			sourceTree = "<group>";
@@ -45,17 +45,9 @@
 		E75C1E3C2EB7AD1400947D37 = {
 			isa = PBXGroup;
 			children = (
-				E75C1E472EB7AD1400947D37 /* ImageFeed */,
-				E75C1E462EB7AD1400947D37 /* Products */,
+				E75C1E822EB8425E00947D37 /* ImageFeed */,
+				E79FB9AC2EBA21BC00E4E049 /* ImageFeed.app */,
 			);
-			sourceTree = "<group>";
-		};
-		E75C1E462EB7AD1400947D37 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				E75C1E452EB7AD1400947D37 /* ImageFeed.app */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -74,13 +66,13 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				E75C1E472EB7AD1400947D37 /* ImageFeed */,
+				E75C1E822EB8425E00947D37 /* ImageFeed */,
 			);
 			name = ImageFeed;
 			packageProductDependencies = (
 			);
 			productName = ImageFeed;
-			productReference = E75C1E452EB7AD1400947D37 /* ImageFeed.app */;
+			productReference = E79FB9AC2EBA21BC00E4E049 /* ImageFeed.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -108,7 +100,7 @@
 			mainGroup = E75C1E3C2EB7AD1400947D37;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = E75C1E462EB7AD1400947D37 /* Products */;
+			productRefGroup = E75C1E3C2EB7AD1400947D37;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -152,7 +144,8 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -162,7 +155,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Debug;
 		};
@@ -180,7 +173,8 @@
 				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
 				INFOPLIST_KEY_UIMainStoryboardFile = Main;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = UIInterfaceOrientationPortrait;
+				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -190,7 +184,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
+				TARGETED_DEVICE_FAMILY = 1;
 			};
 			name = Release;
 		};

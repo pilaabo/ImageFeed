@@ -1,14 +1,7 @@
-//
-//  AppDelegate.swift
-//  ImageFeed
-//
-//  Created by Vladimir Generalov on 02.11.2025.
-//
-
 import UIKit
 
 @main
-class AppDelegate: UIResponder, UIApplicationDelegate {
+final class AppDelegate: UIResponder, UIApplicationDelegate {
 
 
 
