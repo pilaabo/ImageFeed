@@ -31,12 +31,12 @@
             </objects>
             <point key="canvasLocation" x="-1641" y="-260"/>
         </scene>
-        <!--View Controller-->
+        <!--Profile View Controller-->
         <scene sceneID="iZy-DP-ZE4">
             <objects>
-                <viewController id="b08-Ml-XG7" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="aCo-kz-WhM">
-                        <rect key="frame" x="0.0" y="0.0" width="440" height="873"/>
+                <viewController id="b08-Ml-XG7" customClass="ProfileViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" misplaced="YES" id="aCo-kz-WhM">
+                        <rect key="frame" x="0.0" y="0.0" width="440" height="839"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="mock_profile_image" translatesAutoresizingMaskIntoConstraints="NO" id="aIY-NP-FaF">
@@ -55,6 +55,9 @@
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                 <state key="normal" image="Exit"/>
                                 <buttonConfiguration key="configuration" style="plain" image="Exit"/>
+                                <connections>
+                                    <action selector="didTapLogoutButton" destination="b08-Ml-XG7" eventType="touchUpInside" id="r0K-wf-qNy"/>
+                                </connections>
                             </button>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Екатерина Новикова" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="1BL-Mx-QJx">
                                 <rect key="frame" x="15.999999999999986" y="234" width="233.66666666666663" height="27.666666666666686"/>
@@ -91,6 +94,13 @@
                         </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="" image="tab_profile_active" id="nHU-W9-OBL"/>
+                    <connections>
+                        <outlet property="avatarImageView" destination="aIY-NP-FaF" id="U1G-gy-Ivr"/>
+                        <outlet property="descriptionLabel" destination="g0k-zD-Teg" id="Avz-6t-ec7"/>
+                        <outlet property="loginNameLabel" destination="IFv-64-peR" id="Hiw-tr-2XG"/>
+                        <outlet property="logoutButton" destination="Q3P-Pl-yaf" id="iuh-4s-n5y"/>
+                        <outlet property="nameLabel" destination="1BL-Mx-QJx" id="jnd-WF-7yU"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="SLc-l6-vVw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
