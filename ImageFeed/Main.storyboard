@@ -242,6 +242,17 @@
                                     <outlet property="delegate" destination="SfB-Go-Gw9" id="lgz-kA-33k"/>
                                 </connections>
                             </scrollView>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4by-zM-PRd">
+                                <rect key="frame" x="195" y="855" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="gkX-v6-2gJ"/>
+                                    <constraint firstAttribute="height" constant="50" id="nhO-l5-YNA"/>
+                                </constraints>
+                                <buttonConfiguration key="configuration" style="plain" image="sharing_button"/>
+                                <connections>
+                                    <action selector="didTapShareButton" destination="SfB-Go-Gw9" eventType="touchUpInside" id="lW2-aa-9NV"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="1eN-VB-v0t"/>
                         <color key="backgroundColor" red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
@@ -249,9 +260,11 @@
                             <constraint firstItem="KIy-FZ-fhU" firstAttribute="top" secondItem="1eN-VB-v0t" secondAttribute="top" constant="11" id="LfU-iC-TSf"/>
                             <constraint firstAttribute="top" secondItem="bFc-SN-4NE" secondAttribute="top" id="Lqi-gH-M8I"/>
                             <constraint firstItem="bFc-SN-4NE" firstAttribute="bottom" secondItem="HGR-zW-v80" secondAttribute="bottom" id="PXU-lO-OaB"/>
+                            <constraint firstItem="4by-zM-PRd" firstAttribute="centerX" secondItem="HGR-zW-v80" secondAttribute="centerX" id="RcK-kH-ssD"/>
                             <constraint firstItem="KIy-FZ-fhU" firstAttribute="leading" secondItem="1eN-VB-v0t" secondAttribute="leading" constant="8" id="XSb-X3-QCk"/>
                             <constraint firstItem="1eN-VB-v0t" firstAttribute="leading" secondItem="bFc-SN-4NE" secondAttribute="leading" id="bR7-Xa-EUp"/>
                             <constraint firstItem="bFc-SN-4NE" firstAttribute="trailing" secondItem="1eN-VB-v0t" secondAttribute="trailing" id="fUh-eS-rtZ"/>
+                            <constraint firstItem="1eN-VB-v0t" firstAttribute="bottom" secondItem="4by-zM-PRd" secondAttribute="bottom" constant="17" id="nn9-4K-Rvj"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="UyU-uf-Tc7"/>
@@ -271,6 +284,7 @@
         <image name="Liked" width="44" height="44"/>
         <image name="chevron.backward" catalog="system" width="97" height="128"/>
         <image name="mock_profile_image" width="350" height="350"/>
+        <image name="sharing_button" width="50" height="50"/>
         <image name="tab_editorial_active" width="30" height="30"/>
         <image name="tab_profile_active" width="30" height="30"/>
     </resources>
