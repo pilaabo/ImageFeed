@@ -3,13 +3,13 @@ import UIKit
 final class ProfileViewController: UIViewController {
     // MARK: - UI Elements
     
-    let profileImageView = {
-        let profileImage = UIImage(named: "mock_profile_image")
+    private lazy var profileImageView: UIImageView = {
+        let profileImage = UIImage(resource: .mockProfileAvatar)
         let profileImageView = UIImageView(image: profileImage)
         return profileImageView
     }()
     
-    let displayNameLabel = {
+    private lazy var displayNameLabel: UILabel = {
         let displayNameLabel = UILabel()
         displayNameLabel.text = "Екатерина Новикова"
         displayNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
@@ -17,7 +17,7 @@ final class ProfileViewController: UIViewController {
         return displayNameLabel
     }()
     
-    let usernameLabel = {
+    private lazy var usernameLabel: UILabel = {
         let usernameLabel = UILabel()
         usernameLabel.text = "@ekaterina_nov"
         usernameLabel.font = UIFont.systemFont(ofSize: 13)
@@ -25,7 +25,7 @@ final class ProfileViewController: UIViewController {
         return usernameLabel
     }()
     
-    let bioLabel = {
+    private lazy var bioLabel: UILabel = {
         let bioLabel = UILabel()
         bioLabel.text = "Hello, world!"
         bioLabel.font = UIFont.systemFont(ofSize: 13)
@@ -33,9 +33,9 @@ final class ProfileViewController: UIViewController {
         return bioLabel
     }()
     
-    let logoutButton = {
+    private lazy var logoutButton: UIButton = {
         let logoutButton = UIButton()
-        logoutButton.setImage(UIImage(systemName: "ipad.and.arrow.forward"), for: .normal)
+        logoutButton.setImage(.logoutImage, for: .normal)
         logoutButton.tintColor = UIColor(red: 0.96, green: 0.42, blue: 0.42, alpha: 1.0)
         return logoutButton
     }()
