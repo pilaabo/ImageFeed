@@ -36,8 +36,8 @@ extension ImagesListViewController {
         cell.setDate(Date())
         
         let likeImage = indexPath.row % 2 == 0
-            ? UIImage(named: "Liked")
-            : UIImage(named: "Not Liked")
+        ? UIImage(resource: .likedButton)
+        : UIImage(resource: .notLikedButton)
         
         cell.setLike(likeImage)
     }
