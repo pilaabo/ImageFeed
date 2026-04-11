@@ -35,7 +35,7 @@ final class ProfileViewController: UIViewController {
     
     private lazy var logoutButton: UIButton = {
         let logoutButton = UIButton()
-        logoutButton.setImage(.logoutImage, for: .normal)
+        logoutButton.setImage(.logout, for: .normal)
         logoutButton.tintColor = UIColor(red: 0.96, green: 0.42, blue: 0.42, alpha: 1.0)
         return logoutButton
     }()
