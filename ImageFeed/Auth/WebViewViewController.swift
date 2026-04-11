@@ -2,22 +2,29 @@ import UIKit
 import WebKit
 
 final class WebViewViewController: UIViewController {
+
+    // MARK: - Outlets
+
     @IBOutlet private weak var webView: WKWebView?
     @IBOutlet private weak var progressView: UIProgressView?
-    
+
+    // MARK: - Properties
+
     weak var delegate: WebViewViewControllerDelegate?
-    
+
+    // MARK: - Lifecycle
+
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         webView?.navigationDelegate = self
-        
+
         loadAuthView()
     }
-    
+
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
+
         webView?.addObserver(
             self,
             forKeyPath: #keyPath(WKWebView.estimatedProgress),
@@ -25,13 +32,30 @@ final class WebViewViewController: UIViewController {
             context: nil
         )
     }
-    
+
     override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        
+
         webView?.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
     }
-    
+
+    // MARK: - KVO
+
+    override func observeValue(
+        forKeyPath keyPath: String?,
+        of object: Any?,
+        change: [NSKeyValueChangeKey : Any]?,
+        context: UnsafeMutableRawPointer?) {
+
+            if keyPath == #keyPath(WKWebView.estimatedProgress) {
+                updateProgress()
+            } else {
+                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
+            }
+    }
+
+    // MARK: - Private Methods
+
     private func loadAuthView() {
         guard var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString) else {
             print("[WebViewViewController.loadAuthView]: Error - failed to create URLComponents from \(Constants.unsplashAuthorizeURLString)")
@@ -53,27 +77,16 @@ final class WebViewViewController: UIViewController {
         let request = URLRequest(url: url)
         webView?.load(request)
     }
-    
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?) {
-        
-            if keyPath == #keyPath(WKWebView.estimatedProgress) {
-                updateProgress()
-            } else {
-                super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-            }
-    }
-    
+
     private func updateProgress() {
         guard let webView else { return }
-        
+
         progressView?.progress = Float(webView.estimatedProgress)
         progressView?.isHidden = fabs(webView.estimatedProgress - 1.0) <= 0.0001
     }
 }
+
+// MARK: - WKNavigationDelegate
 
 extension WebViewViewController: WKNavigationDelegate {
     func webView(
@@ -103,6 +116,8 @@ extension WebViewViewController: WKNavigationDelegate {
         }
     }
 }
+
+// MARK: - WebViewViewControllerDelegate
 
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
