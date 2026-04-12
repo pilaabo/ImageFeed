@@ -1,4 +1,5 @@
 import UIKit
+import ProgressHUD
 import Logging
 
 final class AuthViewController: UIViewController {
@@ -20,7 +21,7 @@ final class AuthViewController: UIViewController {
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == AuthViewController.segueId, let webVC = segue.destination as? WebViewViewController {
-                webVC.delegate = self
+            webVC.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -40,7 +41,13 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        navigationController?.popViewController(animated: true)
+        
+        ProgressHUD.animate()
+
         OAuth2Service.shared.fetchOAuthToken(from: code) { [weak self] result in
+            ProgressHUD.dismiss()
+
             guard let self else { return }
             
             switch result {
@@ -53,7 +60,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        vc.dismiss(animated: true)
+        navigationController?.popViewController(animated: true)
     }
 }
 
