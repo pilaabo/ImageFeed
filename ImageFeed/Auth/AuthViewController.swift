@@ -1,10 +1,12 @@
 import UIKit
+import Logging
 
 final class AuthViewController: UIViewController {
 
     // MARK: - Properties
 
     private static let segueId = "ShowWebView"
+    private let logger = Logger(label: "AuthViewController")
 
     weak var delegate: AuthViewControllerDelegate?
 
@@ -45,7 +47,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             case .success:
                 self.delegate?.didAuthenticate(self)
             case .failure(let error):
-                print("[AuthViewController.webViewViewController]: fetchOAuthToken failed - \(error.localizedDescription)")
+                self.logger.error("fetchOAuthToken failed - \(error.localizedDescription)")
             }
         }
     }

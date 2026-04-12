@@ -1,4 +1,5 @@
 import Foundation
+import Logging
 
 enum NetworkError: Error {
     case httpStatusCode(Int)
@@ -7,6 +8,15 @@ enum NetworkError: Error {
     case invalidRequest
     case decodingError(Error)
 }
+
+enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+}
+
+private let logger = Logger(label: "URLSession.data")
 
 extension URLSession {
     func data(
@@ -26,19 +36,19 @@ extension URLSession {
                 if 200..<300 ~= response.statusCode {
                     fullfillCompletetionOnTheMainThread(.success(data))
                 } else {
-                    print("[URLSession.data]: NetworkError.httpStatusCode - \(response.statusCode), URL: \(request.url?.absoluteString ?? "nil")")
+                    logger.error("NetworkError.httpStatusCode - \(response.statusCode), URL: \(request.url?.absoluteString ?? "nil")")
                     fullfillCompletetionOnTheMainThread(
                         .failure(NetworkError.httpStatusCode(response.statusCode))
                     )
                 }
 
             } else if let error {
-                print("[URLSession.data]: NetworkError.urlRequestError - \(error.localizedDescription), URL: \(request.url?.absoluteString ?? "nil")")
+                logger.error("NetworkError.urlRequestError - \(error.localizedDescription), URL: \(request.url?.absoluteString ?? "nil")")
                 fullfillCompletetionOnTheMainThread(
                     .failure(NetworkError.urlRequestError(error))
                 )
             } else {
-                print("[URLSession.data]: NetworkError.urlSessionError - unknown session error, URL: \(request.url?.absoluteString ?? "nil")")
+                logger.error("NetworkError.urlSessionError - unknown session error, URL: \(request.url?.absoluteString ?? "nil")")
                 fullfillCompletetionOnTheMainThread(
                     .failure(NetworkError.urlSessionError)
                 )

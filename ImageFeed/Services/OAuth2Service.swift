@@ -1,14 +1,23 @@
 import Foundation
+import Logging
 
 final class OAuth2Service {
     static let shared = OAuth2Service()
-    
+
+    private let logger = Logger(label: "OAuth2Service")
+    private lazy var decoder: JSONDecoder = {
+        let decoder = JSONDecoder()
+        decoder.keyDecodingStrategy = .convertFromSnakeCase
+        return decoder
+    }()
+
     private init() {
     }
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
-            print("[OAuth2Service.makeOAuthTokenRequest]: Error - failed to create URLComponents from 'https://unsplash.com/oauth/token'")
+        let urlString = "https://unsplash.com/oauth/token"
+        guard var urlComponents = URLComponents(string: urlString) else {
+            logger.error("makeOAuthTokenRequest: failed to create URLComponents from '\(urlString)'")
             return nil
         }
         urlComponents.queryItems = [
@@ -20,12 +29,12 @@ final class OAuth2Service {
         ]
 
         guard let url = urlComponents.url else {
-            print("[OAuth2Service.makeOAuthTokenRequest]: Error - failed to build URL from URLComponents: \(urlComponents)")
+            logger.error("makeOAuthTokenRequest: failed to build URL from URLComponents: \(urlComponents)")
             return nil
         }
 
         var request = URLRequest(url: url)
-        request.httpMethod = "POST"
+        request.httpMethod = HTTPMethod.post.rawValue
 
         return request
     }
@@ -35,26 +44,26 @@ final class OAuth2Service {
         completion: @escaping (Result<String, Error>) -> Void
     ) {
         guard let request = makeOAuthTokenRequest(code: code) else {
-            print("[OAuth2Service.fetchOAuthToken]: NetworkError.invalidRequest - unable to build URLRequest for code: \(code)")
+            logger.error("fetchOAuthToken: NetworkError.invalidRequest - unable to build URLRequest for code: \(code)")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
 
-        let task = URLSession.shared.data(for: request) { result in
+        let task = URLSession.shared.data(for: request) { [weak self] result in
+            guard let self else { return }
+            
             switch result {
             case .success(let data):
                 do {
-                    let decoder = JSONDecoder()
-                    decoder.keyDecodingStrategy = .convertFromSnakeCase
-                    let responseBody = try decoder.decode(OAuthTokenResponseBody.self, from: data)
+                    let responseBody = try self.decoder.decode(OAuthTokenResponseBody.self, from: data)
                     OAuth2TokenStorage.token = responseBody.accessToken
                     completion(.success(responseBody.accessToken))
                 } catch {
-                    print("[OAuth2Service.fetchOAuthToken]: NetworkError.decodingError - \(error.localizedDescription), data: \(String(data: data, encoding: .utf8) ?? "nil")")
+                    self.logger.error("fetchOAuthToken: NetworkError.decodingError - \(error.localizedDescription), data: \(String(data: data, encoding: .utf8) ?? "nil")")
                     completion(.failure(NetworkError.decodingError(error)))
                 }
             case .failure(let error):
-                print("[OAuth2Service.fetchOAuthToken]: Network request failed - \(error.localizedDescription)")
+                self.logger.error("fetchOAuthToken: network request failed - \(error.localizedDescription)")
                 completion(.failure(error))
             }
         }

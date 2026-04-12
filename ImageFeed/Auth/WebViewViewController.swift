@@ -1,5 +1,6 @@
 import UIKit
 import WebKit
+import Logging
 
 final class WebViewViewController: UIViewController {
 
@@ -11,6 +12,7 @@ final class WebViewViewController: UIViewController {
     // MARK: - Properties
 
     weak var delegate: WebViewViewControllerDelegate?
+    private let logger = Logger(label: "WebViewViewController")
 
     // MARK: - Lifecycle
 
@@ -58,7 +60,7 @@ final class WebViewViewController: UIViewController {
 
     private func loadAuthView() {
         guard var urlComponents = URLComponents(string: Constants.unsplashAuthorizeURLString) else {
-            print("[WebViewViewController.loadAuthView]: Error - failed to create URLComponents from \(Constants.unsplashAuthorizeURLString)")
+            logger.error("loadAuthView: failed to create URLComponents from \(Constants.unsplashAuthorizeURLString)")
             return
         }
 
@@ -70,7 +72,7 @@ final class WebViewViewController: UIViewController {
         ]
 
         guard let url = urlComponents.url else {
-            print("[WebViewViewController.loadAuthView]: Error - failed to build URL from URLComponents: \(urlComponents)")
+            logger.error("loadAuthView: failed to build URL from URLComponents: \(urlComponents)")
             return
         }
 
