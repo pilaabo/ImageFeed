@@ -16,6 +16,12 @@ final class ImagesListCell: UITableViewCell {
     // MARK: - Properties
     
     private let gradientLayer = CAGradientLayer()
+    
+    private static var dateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "d MMMM yyyy"
+        return formatter
+    }()
         
     // MARK: - Lifecycle
     
@@ -42,9 +48,7 @@ final class ImagesListCell: UITableViewCell {
     }
     
     func setDate(_ date: Date) {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM yyyy"
-        dateLabel?.text = formatter.string(from: date)
+        dateLabel?.text = ImagesListCell.dateFormatter.string(from: date)
     }
     
     func setLike(_ likeImage: UIImage?) {
@@ -57,7 +61,7 @@ final class ImagesListCell: UITableViewCell {
     // MARK: - Private Methods
     
     private func setupGradient() {
-        gradientLayer.colors = [UIColor.transparent, UIColor.opaque]
+        gradientLayer.colors = [UIColor.backgroundTransparent.cgColor, UIColor.background.cgColor]
         gradientLayer.locations = [0.0, 1.0]
         gradientLayer.startPoint = CGPoint(x: 0.5, y: 0.0)
         gradientLayer.endPoint   = CGPoint(x: 0.5, y: 1.0)

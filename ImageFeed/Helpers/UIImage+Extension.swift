@@ -1,5 +1,6 @@
 import UIKit
 
 extension UIImage {
-    static let logoutImage = UIImage(systemName: "ipad.and.arrow.forward")
+    static let logout = UIImage(systemName: "ipad.and.arrow.forward")
+    static let backward = UIImage(systemName: "chevron.backward")
 }
