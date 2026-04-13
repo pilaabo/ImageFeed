@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		E75D77852F8C1A76004BC0D3 /* InMemoryLogging in Frameworks */ = {isa = PBXBuildFile; productRef = E75D77842F8C1A76004BC0D3 /* InMemoryLogging */; };
 		E75D77872F8C1A76004BC0D3 /* Logging in Frameworks */ = {isa = PBXBuildFile; productRef = E75D77862F8C1A76004BC0D3 /* Logging */; };
+		E75D77DD2F8C4C50004BC0D3 /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = E75D77DC2F8C4C50004BC0D3 /* ProgressHUD */; };
 		E7F6CAE02F6D92BA00CECCE0 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E7CA17482F6D8ECA00AFB99C /* WebKit.framework */; };
 /* End PBXBuildFile section */
 
@@ -44,6 +45,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				E75D77872F8C1A76004BC0D3 /* Logging in Frameworks */,
+				E75D77DD2F8C4C50004BC0D3 /* ProgressHUD in Frameworks */,
 				E75D77852F8C1A76004BC0D3 /* InMemoryLogging in Frameworks */,
 				E7F6CAE02F6D92BA00CECCE0 /* WebKit.framework in Frameworks */,
 			);
@@ -91,6 +93,7 @@
 			packageProductDependencies = (
 				E75D77842F8C1A76004BC0D3 /* InMemoryLogging */,
 				E75D77862F8C1A76004BC0D3 /* Logging */,
+				E75D77DC2F8C4C50004BC0D3 /* ProgressHUD */,
 			);
 			productName = ImageFeed;
 			productReference = E79FB9AC2EBA21BC00E4E049 /* ImageFeed.app */;
@@ -122,6 +125,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				E75D77832F8C1A76004BC0D3 /* XCRemoteSwiftPackageReference "swift-log" */,
+				E75D77DB2F8C4C50004BC0D3 /* XCRemoteSwiftPackageReference "ProgressHUD" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = E75C1E3C2EB7AD1400947D37;
@@ -365,6 +369,14 @@
 				minimumVersion = 1.11.0;
 			};
 		};
+		E75D77DB2F8C4C50004BC0D3 /* XCRemoteSwiftPackageReference "ProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/relatedcode/ProgressHUD";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.0.0;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -377,6 +389,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = E75D77832F8C1A76004BC0D3 /* XCRemoteSwiftPackageReference "swift-log" */;
 			productName = Logging;
+		};
+		E75D77DC2F8C4C50004BC0D3 /* ProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E75D77DB2F8C4C50004BC0D3 /* XCRemoteSwiftPackageReference "ProgressHUD" */;
+			productName = ProgressHUD;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

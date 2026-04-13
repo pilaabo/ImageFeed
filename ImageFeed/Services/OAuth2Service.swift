@@ -10,6 +10,9 @@ final class OAuth2Service {
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         return decoder
     }()
+    
+    private var task: URLSessionTask?
+    private var lastCode: String?
 
     private init() {
     }
@@ -43,6 +46,15 @@ final class OAuth2Service {
         from code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
+        assert(Thread.isMainThread)
+        guard lastCode != code else {
+            logger.error("fetchOAuthToken failed - duplicate authorization code, request already in progress")
+            completion(.failure(AuthServiceError.invalidRequest))
+            return
+        }
+        task?.cancel()
+        lastCode = code
+        
         guard let request = makeOAuthTokenRequest(code: code) else {
             logger.error("fetchOAuthToken: NetworkError.invalidRequest - unable to build URLRequest for code: \(code)")
             completion(.failure(NetworkError.invalidRequest))
@@ -66,7 +78,15 @@ final class OAuth2Service {
                 self.logger.error("fetchOAuthToken: network request failed - \(error.localizedDescription)")
                 completion(.failure(error))
             }
+            
+            self.task = nil
+            self.lastCode = nil
         }
+        self.task = task
         task.resume()
     }
+}
+
+enum AuthServiceError: Error {
+    case invalidRequest
 }

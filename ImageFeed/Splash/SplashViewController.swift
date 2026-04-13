@@ -10,7 +10,11 @@ final class SplashViewController: UIViewController {
 
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
-
+        
+        #if DEBUG
+        UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
+        #endif
+        
         if OAuth2TokenStorage.token != nil {
             switchToTabBarController()
         } else {
