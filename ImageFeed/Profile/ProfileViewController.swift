@@ -1,6 +1,12 @@
 import UIKit
+import Logging
 
 final class ProfileViewController: UIViewController {
+
+    // MARK: - Private Properties
+
+    private let logger = Logger(label: "ProfileViewController")
+
     // MARK: - UI Elements
     
     private lazy var profileImageView: UIImageView = {
@@ -17,12 +23,12 @@ final class ProfileViewController: UIViewController {
         return displayNameLabel
     }()
     
-    private lazy var usernameLabel: UILabel = {
-        let usernameLabel = UILabel()
-        usernameLabel.text = "@ekaterina_nov"
-        usernameLabel.font = UIFont.systemFont(ofSize: 13)
-        usernameLabel.textColor = UIColor(red: 174/255.0, green: 175/255.0, blue: 180/255.0, alpha: 1.0)
-        return usernameLabel
+    private lazy var loginNameLabel: UILabel = {
+        let loginNameLabel = UILabel()
+        loginNameLabel.text = "@ekaterina_nov"
+        loginNameLabel.font = UIFont.systemFont(ofSize: 13)
+        loginNameLabel.textColor = UIColor(red: 174/255.0, green: 175/255.0, blue: 180/255.0, alpha: 1.0)
+        return loginNameLabel
     }()
     
     private lazy var bioLabel: UILabel = {
@@ -46,18 +52,46 @@ final class ProfileViewController: UIViewController {
         super.viewDidLoad()
         setupUI()
         setupConstraints()
+        
+        guard let token = OAuth2TokenStorage.token else { return }
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
+            guard let self else { return }
+            
+            switch (result) {
+            case .success(let profile):
+                updateProfileDetails(profile: profile)
+            case .failure(let error):
+                logger.error("fetchProfile failed: \(error.localizedDescription)")
+            }
+        }
     }
     
-    // MARK: - Setup
-    
+    // MARK: - Private Methods
+
+    private func updateProfileDetails(profile: Profile) {
+        displayNameLabel.text = profile.name.isEmpty
+            ? "Имя не указано"
+            : profile.name
+        loginNameLabel.text = profile.loginName.isEmpty
+            ? "@неизвестный_пользователь"
+            : profile.loginName
+        bioLabel.text = profile.bio.isEmpty
+            ? "Профиль не заполнен"
+            : profile.bio
+    }
+
+    // MARK: - Setup UI
+
     private func setupUI() {
         view.addSubview(profileImageView)
         view.addSubview(displayNameLabel)
-        view.addSubview(usernameLabel)
+        view.addSubview(loginNameLabel)
         view.addSubview(bioLabel)
         view.addSubview(logoutButton)
     }
     
+    // MARK: - Setup Constraints
+
     private func setupConstraints() {
         view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         NSLayoutConstraint.activate([
@@ -69,11 +103,11 @@ final class ProfileViewController: UIViewController {
             displayNameLabel.leadingAnchor.constraint(equalTo: profileImageView.leadingAnchor),
             displayNameLabel.topAnchor.constraint(equalTo: profileImageView.bottomAnchor, constant: 8),
             
-            usernameLabel.leadingAnchor.constraint(equalTo: profileImageView.leadingAnchor),
-            usernameLabel.topAnchor.constraint(equalTo: displayNameLabel.bottomAnchor, constant: 8),
+            loginNameLabel.leadingAnchor.constraint(equalTo: profileImageView.leadingAnchor),
+            loginNameLabel.topAnchor.constraint(equalTo: displayNameLabel.bottomAnchor, constant: 8),
             
             bioLabel.leadingAnchor.constraint(equalTo: profileImageView.leadingAnchor),
-            bioLabel.topAnchor.constraint(equalTo: usernameLabel.bottomAnchor, constant: 8),
+            bioLabel.topAnchor.constraint(equalTo: loginNameLabel.bottomAnchor, constant: 8),
             
             logoutButton.widthAnchor.constraint(equalToConstant: 44),
             logoutButton.heightAnchor.constraint(equalToConstant: 44),

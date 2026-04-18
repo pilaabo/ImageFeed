@@ -5,11 +5,6 @@ final class OAuth2Service {
     static let shared = OAuth2Service()
 
     private let logger = Logger(label: "OAuth2Service")
-    private lazy var decoder: JSONDecoder = {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return decoder
-    }()
     
     private var task: URLSessionTask?
     private var lastCode: String?
@@ -49,7 +44,7 @@ final class OAuth2Service {
         assert(Thread.isMainThread)
         guard lastCode != code else {
             logger.error("fetchOAuthToken failed - duplicate authorization code, request already in progress")
-            completion(.failure(AuthServiceError.invalidRequest))
+            completion(.failure(NetworkError.invalidRequest))
             return
         }
         task?.cancel()
@@ -61,32 +56,23 @@ final class OAuth2Service {
             return
         }
 
-        let task = URLSession.shared.data(for: request) { [weak self] result in
+        let task = URLSession.shared.objectTask(for: request) {
+            [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
-            
+
             switch result {
-            case .success(let data):
-                do {
-                    let responseBody = try self.decoder.decode(OAuthTokenResponseBody.self, from: data)
-                    OAuth2TokenStorage.token = responseBody.accessToken
-                    completion(.success(responseBody.accessToken))
-                } catch {
-                    self.logger.error("fetchOAuthToken: NetworkError.decodingError - \(error.localizedDescription), data: \(String(data: data, encoding: .utf8) ?? "nil")")
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
+            case .success(let dto):
+                OAuth2TokenStorage.token = dto.accessToken
+                completion(.success(dto.accessToken))
             case .failure(let error):
-                self.logger.error("fetchOAuthToken: network request failed - \(error.localizedDescription)")
+                self.logger.error("fetchOAuthToken failed: \(error.localizedDescription)")
                 completion(.failure(error))
             }
-            
+
             self.task = nil
             self.lastCode = nil
         }
         self.task = task
         task.resume()
     }
-}
-
-enum AuthServiceError: Error {
-    case invalidRequest
 }
