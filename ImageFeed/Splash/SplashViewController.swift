@@ -15,8 +15,8 @@ final class SplashViewController: UIViewController {
         UserDefaults.standard.removePersistentDomain(forName: Bundle.main.bundleIdentifier!)
         #endif
         
-        if OAuth2TokenStorage.token != nil {
-            switchToTabBarController()
+        if let token = OAuth2TokenStorage.token {
+            fetchProfile(token: token)
         } else {
             performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
         }
@@ -50,6 +50,24 @@ final class SplashViewController: UIViewController {
 
         window.rootViewController = tabBarController
     }
+    
+    private func fetchProfile(token: String) {
+        UIBlockingProgressHUD.show()
+        
+        ProfileService.shared.fetchProfile(token) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            
+            guard let self else { return }
+            
+            switch result {
+            case .success:
+                self.switchToTabBarController()
+            case .failure:
+                // TODO [Sprint 11] Покажите ошибку получения профиля
+                break
+            }
+        }
+    }
 }
 
 // MARK: - AuthViewControllerDelegate
@@ -58,5 +76,9 @@ extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
         switchToTabBarController()
+        
+        guard let token = OAuth2TokenStorage.token else { return }
+        
+        fetchProfile(token: token)
     }
 }

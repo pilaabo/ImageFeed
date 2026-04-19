@@ -53,17 +53,8 @@ final class ProfileViewController: UIViewController {
         setupUI()
         setupConstraints()
         
-        guard let token = OAuth2TokenStorage.token else { return }
-        ProfileService.shared.fetchProfile(token) { [weak self] result in
-            guard let self else { return }
-            
-            switch (result) {
-            case .success(let profile):
-                updateProfileDetails(profile: profile)
-            case .failure(let error):
-                logger.error("fetchProfile failed: \(error.localizedDescription)")
-            }
-        }
+        guard let profile = ProfileService.shared.profile else { return }
+        updateProfileDetails(profile: profile)
     }
     
     // MARK: - Private Methods
