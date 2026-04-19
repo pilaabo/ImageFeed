@@ -44,7 +44,7 @@ final class OAuth2Service {
         assert(Thread.isMainThread)
         guard lastCode != code else {
             logger.error("fetchOAuthToken failed - duplicate authorization code, request already in progress")
-            completion(.failure(NetworkError.invalidRequest))
+            completion(.failure(NetworkError.duplicateRequest))
             return
         }
         task?.cancel()
@@ -56,7 +56,8 @@ final class OAuth2Service {
             return
         }
 
-        let task = URLSession.shared.objectTask(for: request) {
+        var task: URLSessionTask?
+        task = URLSession.shared.objectTask(for: request) {
             [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
 
@@ -69,10 +70,12 @@ final class OAuth2Service {
                 completion(.failure(error))
             }
 
-            self.task = nil
-            self.lastCode = nil
+            if self.task === task {
+                self.task = nil
+                self.lastCode = nil
+            }
         }
         self.task = task
-        task.resume()
+        task?.resume()
     }
 }

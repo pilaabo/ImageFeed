@@ -7,6 +7,8 @@ final class ProfileService {
     private init() {}
 
     private let logger = Logger(label: "ProfileService")
+    
+    private(set) var profile: Profile?
 
     private var task: URLSessionTask?
 
@@ -30,7 +32,8 @@ final class ProfileService {
             return
         }
 
-        let task = URLSession.shared.objectTask(for: request) {
+        var task: URLSessionTask?
+        task = URLSession.shared.objectTask(for: request) {
             [weak self] (result: Result<ProfileResponseBody, Error>) in
 
             guard let self else { return }
@@ -45,28 +48,17 @@ final class ProfileService {
                     loginName: "@\(dto.username)",
                     bio: dto.bio ?? ""
                 )
+                self.profile = profile
                 completion(.success(profile))
             case .failure(let error):
                 self.logger.error("fetchProfile failed: \(error.localizedDescription)")
                 completion(.failure(error))
             }
 
-            self.task = nil
+            if self.task === task { self.task = nil }
         }
         self.task = task
-        task.resume()
+        task?.resume()
     }
 }
 
-struct ProfileResponseBody: Decodable {
-    let username: String
-    let firstName: String?
-    let lastName: String?
-    let bio: String?
-}
-
-struct Profile {
-    let name: String
-    let loginName: String
-    let bio: String
-}
