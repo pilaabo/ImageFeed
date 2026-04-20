@@ -60,7 +60,8 @@ final class SplashViewController: UIViewController {
             guard let self else { return }
             
             switch result {
-            case .success:
+            case .success(let profile):
+                ProfileImageService.shared.fetchProfileImageURL(token: token, username: profile.loginName, { _ in })
                 self.switchToTabBarController()
             case .failure:
                 // TODO [Sprint 11] Покажите ошибку получения профиля

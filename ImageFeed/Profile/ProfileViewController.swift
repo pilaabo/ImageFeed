@@ -6,6 +6,7 @@ final class ProfileViewController: UIViewController {
     // MARK: - Private Properties
 
     private let logger = Logger(label: "ProfileViewController")
+    private var profileImageServiceObserver: NSObjectProtocol?
 
     // MARK: - UI Elements
     
@@ -55,6 +56,16 @@ final class ProfileViewController: UIViewController {
         
         guard let profile = ProfileService.shared.profile else { return }
         updateProfileDetails(profile: profile)
+        
+        profileImageServiceObserver = NotificationCenter.default.addObserver(
+            forName: ProfileImageService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            self.updateProfileImage()
+        }
+        updateProfileImage()
     }
     
     // MARK: - Private Methods
@@ -65,10 +76,18 @@ final class ProfileViewController: UIViewController {
             : profile.name
         loginNameLabel.text = profile.loginName.isEmpty
             ? "@неизвестный_пользователь"
-            : profile.loginName
+            : "@\(profile.loginName)"
         bioLabel.text = profile.bio.isEmpty
             ? "Профиль не заполнен"
             : profile.bio
+    }
+    
+    private func updateProfileImage() {
+        guard let profileImageURL = ProfileImageService.shared.profileImageURL,
+              let url = URL(string: profileImageURL)
+        else { return }
+        
+        // TODO [Sprint 11] Обновите аватар, используя Kingfisher
     }
 
     // MARK: - Setup UI

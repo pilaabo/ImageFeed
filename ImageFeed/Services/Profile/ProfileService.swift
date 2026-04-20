@@ -45,7 +45,7 @@ final class ProfileService {
                     .joined(separator: " ")
                 let profile = Profile(
                     name: fullName,
-                    loginName: "@\(dto.username)",
+                    loginName: dto.username,
                     bio: dto.bio ?? ""
                 )
                 self.profile = profile

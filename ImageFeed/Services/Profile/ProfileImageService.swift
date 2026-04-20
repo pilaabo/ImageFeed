@@ -3,6 +3,7 @@ import Logging
 
 final class ProfileImageService {
     static let shared = ProfileImageService()
+    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
         
     private init() {
         
@@ -10,7 +11,7 @@ final class ProfileImageService {
     
     private let logger = Logger(label: "ProfileImageService")
 
-    private(set) var avatarURL: String?
+    private(set) var profileImageURL: String?
 
     private var task: URLSessionTask?
     
@@ -40,8 +41,14 @@ final class ProfileImageService {
             
             switch result {
             case .success(let dto):
-                self.avatarURL = dto.profileImage?.small
-                completion(.success(self.avatarURL ?? ""))
+                let url = dto.profileImage.small
+                self.profileImageURL = url
+                completion(.success(url))
+                NotificationCenter.default.post(
+                    name: ProfileImageService.didChangeNotification,
+                    object: self,
+                    userInfo: ["URL": url]
+                )
             case .failure(let error):
                 self.logger.error("fetchProfileImageURL failed: \(error.localizedDescription)")
                 completion(.failure(error))

@@ -1,5 +1,5 @@
 struct UserResponseBody: Decodable {
-    struct ProfileImage: Decodable { let small: String? }
+    struct ProfileImage: Decodable { let small: String }
 
-    let profileImage: ProfileImage?
+    let profileImage: ProfileImage
 }
