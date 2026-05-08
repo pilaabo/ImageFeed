@@ -1,7 +1,7 @@
 import UIKit
 import ProgressHUD
 
-final class UIBlockingProgressHUD {
+enum UIBlockingProgressHUD {
     private static var window: UIWindow? {
         UIApplication.shared.connectedScenes
             .compactMap { $0 as? UIWindowScene }

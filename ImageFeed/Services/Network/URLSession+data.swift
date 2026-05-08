@@ -1,7 +1,6 @@
 import Foundation
 import Logging
 
-
 private let logger = Logger(label: "URLSession.data")
 
 extension URLSession {

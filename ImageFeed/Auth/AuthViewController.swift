@@ -1,39 +1,22 @@
 import UIKit
-import ProgressHUD
 import Logging
 
 final class AuthViewController: UIViewController {
 
     // MARK: - Properties
 
-    private static let segueId = "ShowWebView"
     private let logger = Logger(label: "AuthViewController")
 
     weak var delegate: AuthViewControllerDelegate?
 
     // MARK: - Lifecycle
 
-    override func viewDidLoad() {
-        super.viewDidLoad()
-
-        configureBackButton()
-    }
-
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == AuthViewController.segueId, let webVC = segue.destination as? WebViewViewController {
+        if segue.identifier == "ShowWebView", let webVC = segue.destination as? WebViewViewController {
             webVC.delegate = self
         } else {
             super.prepare(for: segue, sender: sender)
         }
-    }
-
-    // MARK: - Private Methods
-
-    private func configureBackButton() {
-        navigationController?.navigationBar.backIndicatorImage = .backward
-        navigationController?.navigationBar.backIndicatorTransitionMaskImage = .backward
-        navigationItem.backBarButtonItem = UIBarButtonItem(title: "", style: .plain, target: nil, action: nil)
-        navigationItem.backBarButtonItem?.tintColor = .background
     }
 }
 
