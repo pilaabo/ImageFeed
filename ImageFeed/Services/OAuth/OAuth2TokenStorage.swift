@@ -1,14 +1,19 @@
 import Foundation
+import SwiftKeychainWrapper
 
 enum OAuth2TokenStorage {
     private static let tokenKey = "token"
 
     static var token: String? {
         get {
-            UserDefaults.standard.string(forKey: tokenKey)
+            KeychainWrapper.standard.string(forKey: tokenKey)
         }
         set {
-            UserDefaults.standard.set(newValue, forKey: tokenKey)
+            guard let newValue else {
+                KeychainWrapper.standard.removeObject(forKey: tokenKey)
+                return
+            }
+            KeychainWrapper.standard.set(newValue, forKey: tokenKey)
         }
     }
 }
