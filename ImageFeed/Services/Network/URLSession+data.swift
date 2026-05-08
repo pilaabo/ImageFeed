@@ -22,19 +22,19 @@ extension URLSession {
                 if 200..<300 ~= response.statusCode {
                     fulfillCompletionOnTheMainThread(.success(data))
                 } else {
-                    logger.error("NetworkError.httpStatusCode - \(response.statusCode), URL: \(request.url?.absoluteString ?? "nil")")
+                    logger.error("[data]: NetworkError.httpStatusCode - \(response.statusCode), URL: \(request.url?.absoluteString ?? "nil")")
                     fulfillCompletionOnTheMainThread(
                         .failure(NetworkError.httpStatusCode(response.statusCode))
                     )
                 }
 
             } else if let error {
-                logger.error("NetworkError.urlRequestError - \(error.localizedDescription), URL: \(request.url?.absoluteString ?? "nil")")
+                logger.error("[data]: NetworkError.urlRequestError - \(error.localizedDescription), URL: \(request.url?.absoluteString ?? "nil")")
                 fulfillCompletionOnTheMainThread(
                     .failure(NetworkError.urlRequestError(error))
                 )
             } else {
-                logger.error("NetworkError.urlSessionError - unknown session error, URL: \(request.url?.absoluteString ?? "nil")")
+                logger.error("[data]: NetworkError.urlSessionError - unknown session error, URL: \(request.url?.absoluteString ?? "nil")")
                 fulfillCompletionOnTheMainThread(
                     .failure(NetworkError.urlSessionError)
                 )
@@ -55,7 +55,7 @@ extension URLSession {
                     let object = try JSONDecoder.snakeCase.decode(T.self, from: data)
                     completion(.success(object))
                 } catch {
-                    logger.error("objectTask: decoding error - \(error.localizedDescription), type: \(T.self), data: \(String(data: data, encoding: .utf8) ?? "nil")")
+                    logger.error("[objectTask]: NetworkError.decodingError - \(error.localizedDescription), type: \(T.self), data: \(String(data: data, encoding: .utf8) ?? "nil")")
                     completion(.failure(NetworkError.decodingError(error)))
                 }
             case .failure(let error):
