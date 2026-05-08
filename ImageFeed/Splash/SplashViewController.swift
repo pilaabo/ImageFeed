@@ -71,8 +71,7 @@ final class SplashViewController: UIViewController {
                 ProfileImageService.shared.fetchProfileImageURL(token: token, username: profile.loginName, { _ in })
                 self.switchToTabBarController()
             case .failure:
-                // TODO [Sprint 11] Покажите ошибку получения профиля
-                break
+                self.showErrorAlert(message: "Не удалось загрузить профиль")
             }
         }
     }
@@ -83,10 +82,5 @@ final class SplashViewController: UIViewController {
 extension SplashViewController: AuthViewControllerDelegate {
     func didAuthenticate(_ vc: AuthViewController) {
         vc.dismiss(animated: true)
-        switchToTabBarController()
-
-        guard let token = OAuth2TokenStorage.token else { return }
-
-        fetchProfile(token: token)
     }
 }
