@@ -41,8 +41,8 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        navigationController?.popViewController(animated: true)
-        
+        dismiss(animated: true)
+
         UIBlockingProgressHUD.show()
 
         OAuth2Service.shared.fetchOAuthToken(from: code) { [weak self] result in
@@ -61,7 +61,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        navigationController?.popViewController(animated: true)
+        dismiss(animated: true)
     }
 }
 
