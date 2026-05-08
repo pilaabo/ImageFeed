@@ -8,12 +8,12 @@ final class UIBlockingProgressHUD {
             .flatMap { $0.windows }
             .first { $0.isKeyWindow }
     }
-    
+
     static func show() {
         window?.isUserInteractionEnabled = false
         ProgressHUD.animate()
     }
-    
+
     static func dismiss() {
         window?.isUserInteractionEnabled = true
         ProgressHUD.dismiss()

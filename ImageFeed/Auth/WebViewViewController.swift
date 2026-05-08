@@ -27,7 +27,7 @@ final class WebViewViewController: UIViewController {
             options: []
         ) { [weak self] _, _ in
             guard let self else { return }
-            
+
             self.updateProgress()
         }
         loadAuthView()
@@ -80,7 +80,7 @@ extension WebViewViewController: WKNavigationDelegate {
               decisionHandler(.allow)
           }
       }
-    
+
     private func code(from navigationAction: WKNavigationAction) -> String? {
         if
             let url = navigationAction.request.url,
@@ -100,6 +100,6 @@ extension WebViewViewController: WKNavigationDelegate {
 
 protocol WebViewViewControllerDelegate: AnyObject {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String)
-    
+
     func webViewViewControllerDidCancel(_ vc: WebViewViewController)
 }

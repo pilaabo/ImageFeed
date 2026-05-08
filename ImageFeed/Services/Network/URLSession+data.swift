@@ -9,13 +9,13 @@ extension URLSession {
         for request: URLRequest,
         completion: @escaping (Result<Data, Error>) -> Void
     ) -> URLSessionTask {
-        
+
         let fulfillCompletionOnTheMainThread: (Result<Data, Error>) -> Void  = { result in
             DispatchQueue.main.async {
                 completion(result)
             }
         }
-        
+
         let task = dataTask(with: request) { data, response, error in
             if let data, let response = response as? HTTPURLResponse {
 
@@ -40,10 +40,10 @@ extension URLSession {
                 )
             }
         }
-        
+
         return task
     }
-    
+
     func objectTask<T: Decodable>(
         for request: URLRequest,
         completion: @escaping (Result<T, Error>) -> Void

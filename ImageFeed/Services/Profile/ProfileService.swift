@@ -3,11 +3,11 @@ import Logging
 
 final class ProfileService {
     static let shared = ProfileService()
-    
+
     private init() {}
 
     private let logger = Logger(label: "ProfileService")
-    
+
     private(set) var profile: Profile?
 
     private var task: URLSessionTask?

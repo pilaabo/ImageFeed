@@ -5,13 +5,13 @@ final class OAuth2Service {
     static let shared = OAuth2Service()
 
     private let logger = Logger(label: "OAuth2Service")
-    
+
     private var task: URLSessionTask?
     private var lastCode: String?
 
     private init() {
     }
-    
+
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         let urlString = "https://unsplash.com/oauth/token"
         guard var urlComponents = URLComponents(string: urlString) else {
@@ -49,7 +49,7 @@ final class OAuth2Service {
         }
         task?.cancel()
         lastCode = code
-        
+
         guard let request = makeOAuthTokenRequest(code: code) else {
             logger.error("fetchOAuthToken: NetworkError.invalidRequest - unable to build URLRequest for code: \(code)")
             completion(.failure(NetworkError.invalidRequest))
