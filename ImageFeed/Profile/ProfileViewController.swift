@@ -1,5 +1,6 @@
 import UIKit
 import Logging
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
 
@@ -51,7 +52,7 @@ final class ProfileViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        setupUI()
+        setupViews()
         setupConstraints()
         
         guard let profile = ProfileService.shared.profile else { return }
@@ -83,16 +84,36 @@ final class ProfileViewController: UIViewController {
     }
     
     private func updateProfileImage() {
-        guard let profileImageURL = ProfileImageService.shared.profileImageURL,
-              let url = URL(string: profileImageURL)
-        else { return }
-        
-        // TODO [Sprint 11] Обновите аватар, используя Kingfisher
+        guard let profileImageURL = ProfileImageService.shared.profileImageURL else {
+            logger.debug("updateProfileImage: profileImageURL is nil, skipping")
+            return
+        }
+        guard let url = URL(string: profileImageURL) else {
+            logger.error("updateProfileImage: failed to build URL from '\(profileImageURL)'")
+            return
+        }
+
+        logger.info("updateProfileImage: loading avatar from \(url.absoluteString)")
+
+        profileImageView.kf.indicatorType = .activity
+        profileImageView.kf.setImage(
+            with: url,
+            options: [.processor(RoundCornerImageProcessor(cornerRadius: 35))] // 35, потому что длина/ширина по Фигме = 70/70
+        ) { [weak self] result in
+            guard let self else { return }
+            switch result {
+            case .success(let value):
+                self.logger.debug("updateProfileImage: avatar loaded, source: \(value.cacheType)")
+            case .failure(let error):
+                self.logger.error("updateProfileImage: avatar load failed - \(error.localizedDescription)")
+            }
+        }
     }
 
     // MARK: - Setup UI
 
-    private func setupUI() {
+    private func setupViews() {
+        view.backgroundColor = .background
         view.addSubview(profileImageView)
         view.addSubview(displayNameLabel)
         view.addSubview(loginNameLabel)
@@ -100,8 +121,6 @@ final class ProfileViewController: UIViewController {
         view.addSubview(logoutButton)
     }
     
-    // MARK: - Setup Constraints
-
     private func setupConstraints() {
         view.subviews.forEach { $0.translatesAutoresizingMaskIntoConstraints = false }
         NSLayoutConstraint.activate([
