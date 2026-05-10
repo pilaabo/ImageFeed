@@ -15,10 +15,16 @@ final class ProfileImageService {
 
     private var task: URLSessionTask?
 
-    func fetchProfileImageURL(token: String, username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
+    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
 
         task?.cancel()
+
+        guard let token = OAuth2TokenStorage.token else {
+            logger.error("fetchProfileImageURL: NetworkError.invalidRequest - missing OAuth token")
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
 
         guard let request = makeProfileImageRequest(token: token, username: username) else {
             logger.error("fetchProfileImageURL: NetworkError.invalidRequest - unable to build URLRequest")

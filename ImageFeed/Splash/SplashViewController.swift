@@ -21,8 +21,8 @@ final class SplashViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
 
-        if let token = OAuth2TokenStorage.token {
-            fetchProfile(token: token)
+        if OAuth2TokenStorage.token != nil {
+            fetchProfile()
         } else {
             let storyboard = UIStoryboard(name: "Main", bundle: .main)
             let authViewController: AuthViewController = storyboard.instantiateViewController(identifier: "AuthViewController")
@@ -58,17 +58,17 @@ final class SplashViewController: UIViewController {
         window.rootViewController = tabBarController
     }
 
-    private func fetchProfile(token: String) {
+    private func fetchProfile() {
         UIBlockingProgressHUD.show()
 
-        ProfileService.shared.fetchProfile(token) { [weak self] result in
+        ProfileService.shared.fetchProfile { [weak self] result in
             UIBlockingProgressHUD.dismiss()
 
             guard let self else { return }
 
             switch result {
             case .success(let profile):
-                ProfileImageService.shared.fetchProfileImageURL(token: token, username: profile.loginName, { _ in })
+                ProfileImageService.shared.fetchProfileImageURL(username: profile.loginName) { _ in }
                 self.switchToTabBarController()
             case .failure:
                 self.showErrorAlert(message: "Не удалось загрузить профиль")
