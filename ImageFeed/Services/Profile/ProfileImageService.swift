@@ -3,7 +3,7 @@ import Logging
 
 final class ProfileImageService {
     static let shared = ProfileImageService()
-    static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
+    static let didChangeNotification = Notification.Name("ProfileImageProviderDidChange")
 
     private init() {
 
@@ -14,15 +14,6 @@ final class ProfileImageService {
     private(set) var profileImageURL: String?
 
     private var task: URLSessionTask?
-
-    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
-        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
-        guard let url = URL(string: urlString) else { return nil }
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.get.rawValue
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
-    }
 
     func fetchProfileImageURL(token: String, username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
@@ -58,5 +49,14 @@ final class ProfileImageService {
         }
         self.task = task
         task?.resume()
+    }
+
+    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
+        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.get.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
     }
 }
