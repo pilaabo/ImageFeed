@@ -5,15 +5,13 @@ final class OAuth2Service {
     static let shared = OAuth2Service()
 
     private let logger = Logger(label: "OAuth2Service")
-    private lazy var decoder: JSONDecoder = {
-        let decoder = JSONDecoder()
-        decoder.keyDecodingStrategy = .convertFromSnakeCase
-        return decoder
-    }()
+
+    private var task: URLSessionTask?
+    private var lastCode: String?
 
     private init() {
     }
-    
+
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
         let urlString = "https://unsplash.com/oauth/token"
         guard var urlComponents = URLComponents(string: urlString) else {
@@ -43,30 +41,41 @@ final class OAuth2Service {
         from code: String,
         completion: @escaping (Result<String, Error>) -> Void
     ) {
+        assert(Thread.isMainThread)
+        guard lastCode != code else {
+            logger.error("fetchOAuthToken failed - duplicate authorization code, request already in progress")
+            completion(.failure(NetworkError.duplicateRequest))
+            return
+        }
+        task?.cancel()
+        lastCode = code
+
         guard let request = makeOAuthTokenRequest(code: code) else {
             logger.error("fetchOAuthToken: NetworkError.invalidRequest - unable to build URLRequest for code: \(code)")
             completion(.failure(NetworkError.invalidRequest))
             return
         }
 
-        let task = URLSession.shared.data(for: request) { [weak self] result in
+        var task: URLSessionTask?
+        task = URLSession.shared.objectTask(for: request) {
+            [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
             guard let self else { return }
-            
+
             switch result {
-            case .success(let data):
-                do {
-                    let responseBody = try self.decoder.decode(OAuthTokenResponseBody.self, from: data)
-                    OAuth2TokenStorage.token = responseBody.accessToken
-                    completion(.success(responseBody.accessToken))
-                } catch {
-                    self.logger.error("fetchOAuthToken: NetworkError.decodingError - \(error.localizedDescription), data: \(String(data: data, encoding: .utf8) ?? "nil")")
-                    completion(.failure(NetworkError.decodingError(error)))
-                }
+            case .success(let dto):
+                OAuth2TokenStorage.token = dto.accessToken
+                completion(.success(dto.accessToken))
             case .failure(let error):
-                self.logger.error("fetchOAuthToken: network request failed - \(error.localizedDescription)")
+                self.logger.error("fetchOAuthToken failed: \(error.localizedDescription)")
                 completion(.failure(error))
             }
+
+            if self.task === task {
+                self.task = nil
+                self.lastCode = nil
+            }
         }
-        task.resume()
+        self.task = task
+        task?.resume()
     }
 }
