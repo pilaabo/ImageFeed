@@ -1,7 +1,7 @@
 import UIKit
+import Kingfisher
 
 final class ImagesListCell: UITableViewCell {
-
     // MARK: - Reuse Identifier
 
     static let reuseIdentifier = "ImagesListCell"
@@ -25,6 +25,14 @@ final class ImagesListCell: UITableViewCell {
 
     // MARK: - Lifecycle
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        cellImage?.kf.cancelDownloadTask()
+        cellImage?.image = UIImage(resource: .imagesListStub)
+        dateLabel?.text = nil
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         setupGradient()
@@ -40,11 +48,16 @@ final class ImagesListCell: UITableViewCell {
 
     // MARK: - Public Configuration Methods
 
-    func setImage(_ image: UIImage?) {
-        guard let image else {
-            return
-        }
-        cellImage?.image = image
+    func setImage(_ url: URL) {
+        cellImage?.kf.indicatorType = .activity
+        cellImage?.kf.setImage(
+            with: url,
+            placeholder: UIImage(resource: .imagesListStub),
+            options: [
+                .transition(.fade(0.25)),
+                .cacheOriginalImage
+            ]
+        )
     }
 
     func setDate(_ date: Date) {

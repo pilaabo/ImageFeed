@@ -1,26 +1,46 @@
 import UIKit
+import Logging
 
 final class ImagesListViewController: UIViewController {
     // MARK: - Outlets
 
     @IBOutlet private weak var tableView: UITableView?
 
-    // MARK: - Properties
+    // MARK: - Private Properties
+    
+    private var imagesListServiceObserver: NSObjectProtocol?
 
-    private let photosNames = Array(0..<20).map { "\($0)" }
-
-    // MARK: - Date Formatter
-
-    private var dateFormatter: DateFormatter {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "d MMMM yyyy"
-        return formatter
-    }
+    private var images: [Image] = []
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        imagesListServiceObserver = NotificationCenter.default.addObserver(
+            forName: ImagesListService.didChangeNotification,
+            object: nil,
+            queue: .main
+        ) { [weak self] _ in
+            guard let self = self else { return }
+            
+            let oldCount = self.images.count
+            self.images = ImagesListService.shared.images
+            self.updateTableViewAnimated(oldCount: oldCount, newCount: self.images.count)
+        }
+        
+        ImagesListService.shared.fetchImagesNextPage()
+    }
+    
+    // MARK: - Private Methods
+    
+    private func updateTableViewAnimated(oldCount: Int, newCount: Int) {
+        guard let tableView, newCount > oldCount else { return }
+
+        tableView.performBatchUpdates {
+            let indexPaths = (oldCount..<newCount).map { IndexPath(row: $0, section: 0) }
+            tableView.insertRows(at: indexPaths, with: .automatic)
+        }
     }
 }
 
@@ -28,17 +48,14 @@ final class ImagesListViewController: UIViewController {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        guard let image = UIImage(named: photosNames[indexPath.row]) else {
-            return
-        }
-
-        cell.setImage(image)
-        cell.setDate(Date())
-
-        let likeImage = indexPath.row % 2 == 0
+        let image = images[indexPath.row]
+        cell.setImage(image.regularImageURL)
+        cell.setDate(image.createdAt ?? Date())
+        
+        let likeImage = image.isLiked
         ? UIImage(resource: .likedButton)
         : UIImage(resource: .notLikedButton)
-
+        
         cell.setLike(likeImage)
     }
 }
@@ -47,7 +64,7 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        photosNames.count
+        images.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -64,13 +81,13 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        // TODO: Process pagination
+        if indexPath.row == images.count - 1 {
+            ImagesListService.shared.fetchImagesNextPage()
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        guard let image = UIImage(named: photosNames[indexPath.row]) else {
-            return 0
-        }
+        let image = images[indexPath.row]
 
         let imageWidth = image.size.width
         let imageHeight = image.size.height

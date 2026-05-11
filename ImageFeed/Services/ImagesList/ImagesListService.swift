@@ -26,7 +26,7 @@ final class ImagesListService {
         }
         urlComponents.queryItems = [
             URLQueryItem(name: "page", value: "\(lastLoadedPage + 1)"),
-            URLQueryItem(name: "per_page", value: "\(imagesPerPage)")
+            URLQueryItem(name: "per_page", value: "\(Constants.imagesPerPage)")
         ]
         
         guard let url = urlComponents.url else {
@@ -67,6 +67,7 @@ final class ImagesListService {
                         createdAt: imageResponseBody.createdAt,
                         description: imageResponseBody.description,
                         thumbImageURL: imageResponseBody.urls.thumb,
+                        regularImageURL: imageResponseBody.urls.regular,
                         largeImageURL: imageResponseBody.urls.full,
                         isLiked: imageResponseBody.likedByUser
                     )
@@ -77,7 +78,7 @@ final class ImagesListService {
                 NotificationCenter.default.post(
                     name: ImagesListService.didChangeNotification,
                     object: self,
-                    userInfo: ["images": self.images]
+                    userInfo: nil
                 )
             case .failure(let error):
                 self.logger.error("fetchImagesNextPage failed: \(error.localizedDescription)")
