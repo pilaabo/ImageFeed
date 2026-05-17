@@ -76,7 +76,8 @@ final class SingleImageViewController: UIViewController {
                 imageView.frame.size = imageResult.image.size
                 self.rescaleAndCenterImageInScrollView(image: imageResult.image)
             case .failure:
-                self.showErrorAlert(
+                self.showAlert(
+                    title: "Что-то пошло не так(",
                     message: "Попробовать ещё раз?",
                     actions: [
                         UIAlertAction(title: "Не надо", style: .cancel),
