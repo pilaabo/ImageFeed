@@ -7,7 +7,9 @@ final class ImagesListViewController: UIViewController {
     @IBOutlet private weak var tableView: UITableView?
 
     // MARK: - Private Properties
-    
+
+    private static let showSingleImageSegueId = "ShowSingleImage"
+
     private var imagesListServiceObserver: NSObjectProtocol?
 
     private var images: [Image] = []
@@ -42,6 +44,19 @@ final class ImagesListViewController: UIViewController {
             tableView.insertRows(at: indexPaths, with: .automatic)
         }
     }
+
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if segue.identifier == Self.showSingleImageSegueId,
+           let singleImageVC = segue.destination as? SingleImageViewController,
+           let cell = sender as? ImagesListCell {
+
+            guard let indexPath = tableView?.indexPath(for: cell) else { return }
+            let image = images[indexPath.row]
+            singleImageVC.imageUrl = image.largeImageURL
+        } else {
+            super.prepare(for: segue, sender: sender)
+        }
+    }
 }
 
 // MARK: - Configuration
@@ -50,7 +65,7 @@ extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let image = images[indexPath.row]
         cell.setImage(image.regularImageURL)
-        cell.setDate(image.createdAt ?? Date())
+        cell.setDate(image.createdAt)
         
         let likeImage = image.isLiked
         ? UIImage(resource: .likedButton)
@@ -72,6 +87,7 @@ extension ImagesListViewController: UITableViewDataSource {
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
+        imageListCell.delegate = self
         configCell(for: imageListCell, with: indexPath)
         return cell
     }
@@ -100,5 +116,27 @@ extension ImagesListViewController: UITableViewDelegate {
         let scaledHeight = imageHeight * (tableWidth / imageWidth)
 
         return scaledHeight
+    }
+}
+
+// MARK: - ImagesListCellDelegate
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imagesListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView?.indexPath(for: cell) else { return }
+        let image = images[indexPath.row]
+        UIBlockingProgressHUD.show()
+        ImagesListService.shared.changeLike(imageId: image.id, isLike: !image.isLiked) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+
+            guard let self else { return }
+
+            switch result {
+            case .success:
+                self.images = ImagesListService.shared.images
+                self.tableView?.reloadRows(at: [indexPath], with: .none)
+            case .failure:
+                self.showErrorAlert(message: "Не удалось обновить лайк")
+            }
+        }
     }
 }

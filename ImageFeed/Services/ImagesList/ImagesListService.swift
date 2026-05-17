@@ -38,7 +38,22 @@ final class ImagesListService {
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request
     }
-    
+
+    private func makeChangeLikeRequest(token: String, imageId: String, isLike: Bool) -> URLRequest? {
+        let urlString = Constants.defaultBaseURLString + "/photos/\(imageId)/like"
+
+        guard let url = URL(string: urlString) else {
+            logger.error("makeChangeLikeRequest: failed to build URL from '\(urlString)'")
+            return nil
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = isLike ? HTTPMethod.post.rawValue : HTTPMethod.delete.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        return request
+    }
+
     func fetchImagesNextPage() {
         assert(Thread.isMainThread)
 
@@ -66,7 +81,6 @@ final class ImagesListService {
                         size: CGSize(width: imageResponseBody.width, height: imageResponseBody.height),
                         createdAt: imageResponseBody.createdAt,
                         description: imageResponseBody.description,
-                        thumbImageURL: imageResponseBody.urls.thumb,
                         regularImageURL: imageResponseBody.urls.regular,
                         largeImageURL: imageResponseBody.urls.full,
                         isLiked: imageResponseBody.likedByUser
@@ -88,5 +102,36 @@ final class ImagesListService {
         }
         self.task = task
         task?.resume()
+    }
+    
+    func changeLike(imageId: String, isLike: Bool, _ completion: @escaping (Result<Void, Error>) -> Void) {
+        assert(Thread.isMainThread)
+
+        guard let token = OAuth2TokenStorage.token else {
+            logger.error("changeLike: NetworkError.invalidRequest - missing OAuth token")
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
+
+        guard let request = makeChangeLikeRequest(token: token, imageId: imageId, isLike: isLike) else {
+            logger.error("changeLike: NetworkError.invalidRequest - unable to build URLRequest")
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
+
+        URLSession.shared.data(for: request) { [weak self] (result: Result<Data, Error>) in
+            guard let self else { return }
+
+            switch result {
+            case .success:
+                if let index = self.images.firstIndex(where: { $0.id == imageId }) {
+                    self.images[index].isLiked = isLike
+                }
+                completion( .success(()) )
+            case .failure(let error):
+                self.logger.error("changeLike failed with imageId = \(imageId): \(error.localizedDescription)")
+                completion(.failure(error))
+            }
+        }.resume()
     }
 }

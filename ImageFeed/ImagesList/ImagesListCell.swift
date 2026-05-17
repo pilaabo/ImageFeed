@@ -13,7 +13,15 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet private weak var likeButton: UIButton?
     @IBOutlet private weak var gradientView: UIView?
 
+    // MARK: - Actions
+
+    @IBAction private func likeButtonClicked() {
+        delegate?.imagesListCellDidTapLike(self)
+    }
+
     // MARK: - Properties
+
+    weak var delegate: ImagesListCellDelegate?
 
     private let gradientLayer = CAGradientLayer()
 
@@ -81,4 +89,8 @@ final class ImagesListCell: UITableViewCell {
 
         gradientView?.layer.insertSublayer(gradientLayer, at: 0)
     }
+}
+
+protocol ImagesListCellDelegate: AnyObject {
+    func imagesListCellDidTapLike(_ cell: ImagesListCell)
 }
