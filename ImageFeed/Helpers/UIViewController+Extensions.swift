@@ -3,10 +3,11 @@ import UIKit
 extension UIViewController {
     func showErrorAlert(
         title: String = "Что-то пошло не так(",
-        message: String
+        message: String,
+        actions: [UIAlertAction] = [UIAlertAction(title: "ОК", style: .default)]
     ) {
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.addAction(UIAlertAction(title: "ОК", style: .default))
+        actions.forEach { alert.addAction($0) }
         present(alert, animated: true)
     }
 }
