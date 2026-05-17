@@ -66,5 +66,11 @@ final class ProfileService {
         self.task = task
         task?.resume()
     }
+
+    func resetFetchedProfile() {
+        task?.cancel()
+        task = nil
+        profile = nil
+    }
 }
 

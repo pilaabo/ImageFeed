@@ -15,6 +15,15 @@ final class ProfileImageService {
 
     private var task: URLSessionTask?
 
+    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
+        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.get.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
 
@@ -57,12 +66,9 @@ final class ProfileImageService {
         task?.resume()
     }
 
-    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
-        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
-        guard let url = URL(string: urlString) else { return nil }
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.get.rawValue
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
+    func resetFetchedProfileImageURL() {
+        task?.cancel()
+        task = nil
+        profileImageURL = nil
     }
 }

@@ -45,6 +45,10 @@ final class ProfileViewController: UIViewController {
         let logoutButton = UIButton()
         logoutButton.setImage(.logout, for: .normal)
         logoutButton.tintColor = UIColor(red: 0.96, green: 0.42, blue: 0.42, alpha: 1.0)
+        logoutButton.addAction(
+            UIAction { [weak self] _ in self?.didTapLogoutButton() },
+            for: .touchUpInside
+        )
         return logoutButton
     }()
 
@@ -67,6 +71,21 @@ final class ProfileViewController: UIViewController {
             self.updateProfileImage()
         }
         updateProfileImage()
+    }
+
+    // MARK: - Actions
+
+    private func didTapLogoutButton() {
+        showAlert(
+            title: "Пока, пока!",
+            message: "Уверены, что хотите выйти?",
+            actions: [
+                UIAlertAction(title: "Да", style: .default) { _ in
+                    LogoutService.shared.logout()
+                },
+                UIAlertAction(title: "Нет", style: .cancel),
+            ]
+        )
     }
 
     // MARK: - Private Methods

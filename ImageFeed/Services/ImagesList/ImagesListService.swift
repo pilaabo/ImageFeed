@@ -134,4 +134,11 @@ final class ImagesListService {
             }
         }.resume()
     }
+
+    func resetFetchedImages() {
+        task?.cancel()
+        task = nil
+        images = []
+        lastLoadedPage = 0
+    }
 }
