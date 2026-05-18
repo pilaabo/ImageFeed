@@ -1,11 +1,11 @@
 import Foundation
 
-struct ImageResponseBody: Decodable {
+struct PhotoResult: Decodable {
     let id: String
-    let createdAt: Date
+    let createdAt: Date?
     let width: Int
     let height: Int
     let description: String?
-    let urls: UrlsResponseBody
+    let urls: UrlsResult
     let likedByUser: Bool
 }

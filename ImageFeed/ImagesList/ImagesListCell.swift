@@ -68,14 +68,14 @@ final class ImagesListCell: UITableViewCell {
         )
     }
 
-    func setDate(_ date: Date) {
-        dateLabel?.text = ImagesListCell.dateFormatter.string(from: date)
+    func setDate(_ date: Date?) {
+        dateLabel?.text = date.map { ImagesListCell.dateFormatter.string(from: $0) }
     }
 
-    func setLike(_ likeImage: UIImage?) {
-        guard let likeImage else {
-            return
-        }
+    func setIsLiked(_ isLiked: Bool) {
+        let likeImage = isLiked
+            ? UIImage(resource: .likedButton)
+            : UIImage(resource: .notLikedButton)
         likeButton?.setImage(likeImage, for: .normal)
     }
 

@@ -12,7 +12,7 @@ final class LogoutService {
 
         ProfileService.shared.resetFetchedProfile()
         ProfileImageService.shared.resetFetchedProfileImageURL()
-        ImagesListService.shared.resetFetchedImages()
+        ImagesListService.shared.resetFetchedPhotos()
 
         switchToSplashScreenController()
     }

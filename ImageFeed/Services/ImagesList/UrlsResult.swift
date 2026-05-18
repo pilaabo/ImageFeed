@@ -1,6 +1,6 @@
 import Foundation
 
-struct UrlsResponseBody: Decodable {
+struct UrlsResult: Decodable {
     let full: URL
     let regular: URL
 }

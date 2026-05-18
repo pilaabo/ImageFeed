@@ -12,30 +12,30 @@ final class ImagesListViewController: UIViewController {
 
     private var imagesListServiceObserver: NSObjectProtocol?
 
-    private var images: [Image] = []
+    private var photos: [Photo] = []
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+
         imagesListServiceObserver = NotificationCenter.default.addObserver(
             forName: ImagesListService.didChangeNotification,
             object: nil,
             queue: .main
         ) { [weak self] _ in
             guard let self = self else { return }
-            
-            let oldCount = self.images.count
-            self.images = ImagesListService.shared.images
-            self.updateTableViewAnimated(oldCount: oldCount, newCount: self.images.count)
+
+            let oldCount = self.photos.count
+            self.photos = ImagesListService.shared.photos
+            self.updateTableViewAnimated(oldCount: oldCount, newCount: self.photos.count)
         }
-        
-        ImagesListService.shared.fetchImagesNextPage()
+
+        ImagesListService.shared.fetchPhotosNextPage()
     }
-    
+
     // MARK: - Private Methods
-    
+
     private func updateTableViewAnimated(oldCount: Int, newCount: Int) {
         guard let tableView, newCount > oldCount else { return }
 
@@ -51,8 +51,8 @@ final class ImagesListViewController: UIViewController {
            let cell = sender as? ImagesListCell {
 
             guard let indexPath = tableView?.indexPath(for: cell) else { return }
-            let image = images[indexPath.row]
-            singleImageVC.imageUrl = image.largeImageURL
+            let photo = photos[indexPath.row]
+            singleImageVC.imageUrl = photo.largeImageURL
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -63,15 +63,10 @@ final class ImagesListViewController: UIViewController {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let image = images[indexPath.row]
-        cell.setImage(image.regularImageURL)
-        cell.setDate(image.createdAt)
-        
-        let likeImage = image.isLiked
-        ? UIImage(resource: .likedButton)
-        : UIImage(resource: .notLikedButton)
-        
-        cell.setLike(likeImage)
+        let photo = photos[indexPath.row]
+        cell.setImage(photo.regularImageURL)
+        cell.setDate(photo.createdAt)
+        cell.setIsLiked(photo.isLiked)
     }
 }
 
@@ -79,7 +74,7 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        images.count
+        photos.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -97,16 +92,16 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == images.count - 1 {
-            ImagesListService.shared.fetchImagesNextPage()
+        if indexPath.row == photos.count - 1 {
+            ImagesListService.shared.fetchPhotosNextPage()
         }
     }
-    
-    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let image = images[indexPath.row]
 
-        let imageWidth = image.size.width
-        let imageHeight = image.size.height
+    func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        let photo = photos[indexPath.row]
+
+        let imageWidth = photo.size.width
+        let imageHeight = photo.size.height
         let tableWidth = tableView.bounds.width
 
         guard imageWidth > 0 else {
@@ -123,16 +118,16 @@ extension ImagesListViewController: UITableViewDelegate {
 extension ImagesListViewController: ImagesListCellDelegate {
     func imagesListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView?.indexPath(for: cell) else { return }
-        let image = images[indexPath.row]
+        let photo = photos[indexPath.row]
         UIBlockingProgressHUD.show()
-        ImagesListService.shared.changeLike(imageId: image.id, isLike: !image.isLiked) { [weak self] result in
+        ImagesListService.shared.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
             UIBlockingProgressHUD.dismiss()
 
             guard let self else { return }
 
             switch result {
             case .success:
-                self.images = ImagesListService.shared.images
+                self.photos = ImagesListService.shared.photos
                 self.tableView?.reloadRows(at: [indexPath], with: .none)
             case .failure:
                 self.showErrorAlert(message: "Не удалось обновить лайк")
