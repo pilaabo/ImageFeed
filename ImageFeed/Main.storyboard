@@ -173,6 +173,9 @@
                                                     </constraints>
                                                     <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
                                                     <state key="normal" image="liked_button"/>
+                                                    <connections>
+                                                        <action selector="likeButtonClicked" destination="sfO-yf-vjk" eventType="touchUpInside" id="Xrf-9s-NKV"/>
+                                                    </connections>
                                                 </button>
                                             </subviews>
                                             <constraints>
@@ -194,7 +197,7 @@
                                             <outlet property="dateLabel" destination="qLo-iL-4ww" id="HhP-LW-W23"/>
                                             <outlet property="gradientView" destination="NxF-zk-7iZ" id="BJp-9N-kdb"/>
                                             <outlet property="likeButton" destination="62c-va-xhC" id="wwK-La-cVe"/>
-                                            <segue destination="SfB-Go-Gw9" kind="presentation" id="VpI-NW-VAt"/>
+                                            <segue destination="SfB-Go-Gw9" kind="presentation" identifier="ShowSingleImage" id="VpI-NW-VAt"/>
                                         </connections>
                                     </tableViewCell>
                                 </prototypes>

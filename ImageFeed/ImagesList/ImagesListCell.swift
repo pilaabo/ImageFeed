@@ -1,7 +1,7 @@
 import UIKit
+import Kingfisher
 
 final class ImagesListCell: UITableViewCell {
-
     // MARK: - Reuse Identifier
 
     static let reuseIdentifier = "ImagesListCell"
@@ -13,7 +13,15 @@ final class ImagesListCell: UITableViewCell {
     @IBOutlet private weak var likeButton: UIButton?
     @IBOutlet private weak var gradientView: UIView?
 
+    // MARK: - Actions
+
+    @IBAction private func likeButtonClicked() {
+        delegate?.imagesListCellDidTapLike(self)
+    }
+
     // MARK: - Properties
+
+    weak var delegate: ImagesListCellDelegate?
 
     private let gradientLayer = CAGradientLayer()
 
@@ -25,6 +33,14 @@ final class ImagesListCell: UITableViewCell {
 
     // MARK: - Lifecycle
 
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        
+        cellImage?.kf.cancelDownloadTask()
+        cellImage?.image = UIImage(resource: .imagesListStub)
+        dateLabel?.text = nil
+    }
+    
     override func awakeFromNib() {
         super.awakeFromNib()
         setupGradient()
@@ -40,21 +56,24 @@ final class ImagesListCell: UITableViewCell {
 
     // MARK: - Public Configuration Methods
 
-    func setImage(_ image: UIImage?) {
-        guard let image else {
-            return
-        }
-        cellImage?.image = image
+    func setImage(_ url: URL) {
+        cellImage?.kf.indicatorType = .activity
+        cellImage?.kf.setImage(
+            with: url,
+            placeholder: UIImage(resource: .imagesListStub),
+            options: [
+                .transition(.fade(0.25)),
+                .cacheOriginalImage
+            ]
+        )
     }
 
-    func setDate(_ date: Date) {
-        dateLabel?.text = ImagesListCell.dateFormatter.string(from: date)
+    func setDate(_ date: Date?) {
+        dateLabel?.text = date.map { ImagesListCell.dateFormatter.string(from: $0) }
     }
 
-    func setLike(_ likeImage: UIImage?) {
-        guard let likeImage else {
-            return
-        }
+    func setIsLiked(_ isLiked: Bool) {
+        let likeImage = UIImage(resource: isLiked ? .likedButton : .notLikedButton)
         likeButton?.setImage(likeImage, for: .normal)
     }
 
@@ -68,4 +87,8 @@ final class ImagesListCell: UITableViewCell {
 
         gradientView?.layer.insertSublayer(gradientLayer, at: 0)
     }
+}
+
+protocol ImagesListCellDelegate: AnyObject {
+    func imagesListCellDidTapLike(_ cell: ImagesListCell)
 }

@@ -21,10 +21,16 @@ final class ProfileService {
         return urlRequest
     }
 
-    func fetchProfile(_ token: String, completion: @escaping (Result<Profile, Error>) -> Void) {
+    func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
 
         task?.cancel()
+
+        guard let token = OAuth2TokenStorage.token else {
+            logger.error("fetchProfile: NetworkError.invalidRequest - missing OAuth token")
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
 
         guard let request = makeProfileRequest(token: token) else {
             logger.error("fetchProfile: NetworkError.invalidRequest - unable to build URLRequest")
@@ -59,6 +65,12 @@ final class ProfileService {
         }
         self.task = task
         task?.resume()
+    }
+
+    func resetFetchedProfile() {
+        task?.cancel()
+        task = nil
+        profile = nil
     }
 }
 

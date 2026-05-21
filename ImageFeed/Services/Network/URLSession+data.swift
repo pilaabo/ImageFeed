@@ -51,7 +51,7 @@ extension URLSession {
             switch (result) {
             case .success(let data):
                 do {
-                    let object = try JSONDecoder.snakeCase.decode(T.self, from: data)
+                    let object = try JSONDecoder.forUnsplash.decode(T.self, from: data)
                     completion(.success(object))
                 } catch {
                     logger.error("[objectTask]: NetworkError.decodingError - \(error.localizedDescription), type: \(T.self), data: \(String(data: data, encoding: .utf8) ?? "nil")")

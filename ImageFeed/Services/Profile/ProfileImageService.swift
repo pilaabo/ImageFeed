@@ -15,10 +15,25 @@ final class ProfileImageService {
 
     private var task: URLSessionTask?
 
-    func fetchProfileImageURL(token: String, username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
+    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
+        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.get.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+
+    func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
 
         task?.cancel()
+
+        guard let token = OAuth2TokenStorage.token else {
+            logger.error("fetchProfileImageURL: NetworkError.invalidRequest - missing OAuth token")
+            completion(.failure(NetworkError.invalidRequest))
+            return
+        }
 
         guard let request = makeProfileImageRequest(token: token, username: username) else {
             logger.error("fetchProfileImageURL: NetworkError.invalidRequest - unable to build URLRequest")
@@ -51,12 +66,9 @@ final class ProfileImageService {
         task?.resume()
     }
 
-    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
-        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
-        guard let url = URL(string: urlString) else { return nil }
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.get.rawValue
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
+    func resetFetchedProfileImageURL() {
+        task?.cancel()
+        task = nil
+        profileImageURL = nil
     }
 }
