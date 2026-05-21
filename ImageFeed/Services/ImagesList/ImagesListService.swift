@@ -80,8 +80,8 @@ final class ImagesListService {
                         size: CGSize(width: photoResult.width, height: photoResult.height),
                         createdAt: photoResult.createdAt,
                         description: photoResult.description,
-                        regularImageURL: photoResult.urls.regular,
-                        largeImageURL: photoResult.urls.full,
+                        regularImageURL: photoResult.urls.regularUrl,
+                        largeImageURL: photoResult.urls.fullUrl,
                         isLiked: photoResult.likedByUser
                     )
                 }
@@ -124,7 +124,7 @@ final class ImagesListService {
             switch result {
             case .success:
                 if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
-                    self.photos[index].isLiked = isLike
+                    self.photos[index] = self.photos[index].withIsLiked(isLike)
                 }
                 completion(.success(()))
             case .failure(let error):
