@@ -1,42 +1,35 @@
 import UIKit
-import Logging
 
-final class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController, ImagesListViewControllerProtocol {
     // MARK: - Outlets
 
     @IBOutlet private weak var tableView: UITableView?
+
+    // MARK: - Properties
+
+    private var presenter: ImagesListPresenterProtocol!
 
     // MARK: - Private Properties
 
     private static let showSingleImageSegueId = "ShowSingleImage"
 
-    private var imagesListServiceObserver: NSObjectProtocol?
+    // MARK: - Configuration
 
-    private var photos: [Photo] = []
+    func configure(_ presenter: ImagesListPresenterProtocol) {
+        self.presenter = presenter
+        presenter.view = self
+    }
 
     // MARK: - Lifecycle
 
     override func viewDidLoad() {
         super.viewDidLoad()
-
-        imagesListServiceObserver = NotificationCenter.default.addObserver(
-            forName: ImagesListService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self else { return }
-
-            let oldCount = self.photos.count
-            self.photos = ImagesListService.shared.photos
-            self.updateTableViewAnimated(oldCount: oldCount, newCount: self.photos.count)
-        }
-
-        ImagesListService.shared.fetchPhotosNextPage()
+        presenter.viewDidLoad()
     }
 
-    // MARK: - Private Methods
+    // MARK: - ImagesListViewControllerProtocol
 
-    private func updateTableViewAnimated(oldCount: Int, newCount: Int) {
+    func updateTableViewAnimated(oldCount: Int, newCount: Int) {
         guard let tableView, newCount > oldCount else { return }
 
         tableView.performBatchUpdates {
@@ -45,14 +38,30 @@ final class ImagesListViewController: UIViewController {
         }
     }
 
+    func reloadRow(at indexPath: IndexPath) {
+        tableView?.reloadRows(at: [indexPath], with: .none)
+    }
+
+    func setLoading(_ isLoading: Bool) {
+        if isLoading {
+            UIBlockingProgressHUD.show()
+        } else {
+            UIBlockingProgressHUD.dismiss()
+        }
+    }
+
+    func showLikeError() {
+        showErrorAlert(message: "Не удалось обновить лайк")
+    }
+
+    // MARK: - Navigation
+
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == Self.showSingleImageSegueId,
            let singleImageVC = segue.destination as? SingleImageViewController,
-           let cell = sender as? ImagesListCell {
-
-            guard let indexPath = tableView?.indexPath(for: cell) else { return }
-            let photo = photos[indexPath.row]
-            singleImageVC.imageUrl = photo.largeImageURL
+           let cell = sender as? ImagesListCell,
+           let indexPath = tableView?.indexPath(for: cell) {
+            singleImageVC.imageUrl = presenter.photo(at: indexPath).largeImageURL
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -63,7 +72,7 @@ final class ImagesListViewController: UIViewController {
 
 extension ImagesListViewController {
     func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
-        let photo = photos[indexPath.row]
+        let photo = presenter.photo(at: indexPath)
         cell.setImage(photo.regularImageURL)
         cell.setDate(photo.createdAt)
         cell.setIsLiked(photo.isLiked)
@@ -74,7 +83,7 @@ extension ImagesListViewController {
 
 extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        photos.count
+        presenter.photos.count
     }
 
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -92,46 +101,27 @@ extension ImagesListViewController: UITableViewDataSource {
 
 extension ImagesListViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-        if indexPath.row == photos.count - 1 {
-            ImagesListService.shared.fetchPhotosNextPage()
-        }
+        presenter.willDisplayRow(at: indexPath)
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        let photo = photos[indexPath.row]
+        let photo = presenter.photo(at: indexPath)
 
         let imageWidth = photo.size.width
         let imageHeight = photo.size.height
         let tableWidth = tableView.bounds.width
 
-        guard imageWidth > 0 else {
-            return 0
-        }
+        guard imageWidth > 0 else { return 0 }
 
-        let scaledHeight = imageHeight * (tableWidth / imageWidth)
-
-        return scaledHeight
+        return imageHeight * (tableWidth / imageWidth)
     }
 }
 
 // MARK: - ImagesListCellDelegate
+
 extension ImagesListViewController: ImagesListCellDelegate {
     func imagesListCellDidTapLike(_ cell: ImagesListCell) {
         guard let indexPath = tableView?.indexPath(for: cell) else { return }
-        let photo = photos[indexPath.row]
-        UIBlockingProgressHUD.show()
-        ImagesListService.shared.changeLike(photoId: photo.id, isLike: !photo.isLiked) { [weak self] result in
-            UIBlockingProgressHUD.dismiss()
-
-            guard let self else { return }
-
-            switch result {
-            case .success:
-                self.photos = ImagesListService.shared.photos
-                self.tableView?.reloadRows(at: [indexPath], with: .none)
-            case .failure:
-                self.showErrorAlert(message: "Не удалось обновить лайк")
-            }
-        }
+        presenter.didTapLike(at: indexPath)
     }
 }

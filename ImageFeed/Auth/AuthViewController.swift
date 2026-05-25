@@ -1,19 +1,17 @@
 import UIKit
-import Logging
 
 final class AuthViewController: UIViewController {
 
     // MARK: - Properties
 
-    private let logger = Logger(label: "AuthViewController")
-
     weak var delegate: AuthViewControllerDelegate?
 
-    // MARK: - Lifecycle
+    // MARK: - Navigation
 
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "ShowWebView", let webVC = segue.destination as? WebViewViewController {
             webVC.delegate = self
+            webVC.configure(WebViewPresenter(authHelper: AuthHelper()))
         } else {
             super.prepare(for: segue, sender: sender)
         }
@@ -36,8 +34,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
             switch result {
             case .success:
                 self.delegate?.didAuthenticate(self)
-            case .failure(let error):
-                self.logger.error("fetchOAuthToken failed - \(error.localizedDescription)")
+            case .failure:
                 showErrorAlert(message: "Не удалось войти в систему")
             }
         }
