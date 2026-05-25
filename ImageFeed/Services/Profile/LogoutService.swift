@@ -2,9 +2,15 @@ import UIKit
 import WebKit
 
 final class LogoutService {
+    // MARK: - Properties
+
     static let shared = LogoutService()
 
-    private init() { }
+    // MARK: - Initialization
+
+    private init() {}
+
+    // MARK: - Public Methods
 
     func logout() {
         OAuth2TokenStorage.token = nil
@@ -17,13 +23,15 @@ final class LogoutService {
         switchToSplashScreenController()
     }
 
+    // MARK: - Private Methods
+
     private func cleanCookies() {
-      HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
-      WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
-         records.forEach { record in
-            WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes, for: [record], completionHandler: {})
-         }
-      }
+        HTTPCookieStorage.shared.removeCookies(since: Date.distantPast)
+        WKWebsiteDataStore.default().fetchDataRecords(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes()) { records in
+            records.forEach { record in
+                WKWebsiteDataStore.default().removeData(ofTypes: record.dataTypes, for: [record], completionHandler: {})
+            }
+        }
     }
 
     private func switchToSplashScreenController() {

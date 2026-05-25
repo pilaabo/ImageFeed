@@ -2,12 +2,10 @@ import Foundation
 import Logging
 
 final class ProfileImageService {
+    // MARK: - Properties
+
     static let shared = ProfileImageService()
     static let didChangeNotification = Notification.Name("ProfileImageProviderDidChange")
-
-    private init() {
-
-    }
 
     private let logger = Logger(label: "ProfileImageService")
 
@@ -15,14 +13,11 @@ final class ProfileImageService {
 
     private var task: URLSessionTask?
 
-    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
-        let urlString = Constants.defaultBaseURLString + "/users/\(username)"
-        guard let url = URL(string: urlString) else { return nil }
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.get.rawValue
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
-    }
+    // MARK: - Initialization
+
+    private init() {}
+
+    // MARK: - Public Methods
 
     func fetchProfileImageURL(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         assert(Thread.isMainThread)
@@ -70,5 +65,16 @@ final class ProfileImageService {
         task?.cancel()
         task = nil
         profileImageURL = nil
+    }
+
+    // MARK: - Private Methods
+
+    private func makeProfileImageRequest(token: String, username: String) -> URLRequest? {
+        let urlString = AuthConfiguration.standard.defaultBaseURLString + "/users/\(username)"
+        guard let url = URL(string: urlString) else { return nil }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.get.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
     }
 }

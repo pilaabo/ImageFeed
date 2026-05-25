@@ -2,6 +2,8 @@ import Foundation
 import Logging
 
 final class OAuth2Service {
+    // MARK: - Properties
+
     static let shared = OAuth2Service()
 
     private let logger = Logger(label: "OAuth2Service")
@@ -9,33 +11,11 @@ final class OAuth2Service {
     private var task: URLSessionTask?
     private var lastCode: String?
 
-    private init() {
-    }
+    // MARK: - Initialization
 
-    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        let urlString = "https://unsplash.com/oauth/token"
-        guard var urlComponents = URLComponents(string: urlString) else {
-            logger.error("makeOAuthTokenRequest: failed to create URLComponents from '\(urlString)'")
-            return nil
-        }
-        urlComponents.queryItems = [
-            URLQueryItem(name: "client_id", value: Constants.accessKey),
-            URLQueryItem(name: "client_secret", value: Constants.secretKey),
-            URLQueryItem(name: "redirect_uri", value: Constants.redirectURI),
-            URLQueryItem(name: "code", value: code),
-            URLQueryItem(name: "grant_type", value: "authorization_code"),
-        ]
+    private init() {}
 
-        guard let url = urlComponents.url else {
-            logger.error("makeOAuthTokenRequest: failed to build URL from URLComponents: \(urlComponents)")
-            return nil
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.post.rawValue
-
-        return request
-    }
+    // MARK: - Public Methods
 
     func fetchOAuthToken(
         from code: String,
@@ -77,5 +57,32 @@ final class OAuth2Service {
         }
         self.task = task
         task?.resume()
+    }
+
+    // MARK: - Private Methods
+
+    private func makeOAuthTokenRequest(code: String) -> URLRequest? {
+        let urlString = "https://unsplash.com/oauth/token"
+        guard var urlComponents = URLComponents(string: urlString) else {
+            logger.error("makeOAuthTokenRequest: failed to create URLComponents from '\(urlString)'")
+            return nil
+        }
+        urlComponents.queryItems = [
+            URLQueryItem(name: "client_id", value: AuthConfiguration.standard.accessKey),
+            URLQueryItem(name: "client_secret", value: AuthConfiguration.standard.secretKey),
+            URLQueryItem(name: "redirect_uri", value: AuthConfiguration.standard.redirectURI),
+            URLQueryItem(name: "code", value: code),
+            URLQueryItem(name: "grant_type", value: "authorization_code"),
+        ]
+
+        guard let url = urlComponents.url else {
+            logger.error("makeOAuthTokenRequest: failed to build URL from URLComponents: \(urlComponents)")
+            return nil
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.post.rawValue
+
+        return request
     }
 }
