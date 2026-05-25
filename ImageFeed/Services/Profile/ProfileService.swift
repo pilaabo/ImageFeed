@@ -2,9 +2,9 @@ import Foundation
 import Logging
 
 final class ProfileService {
-    static let shared = ProfileService()
+    // MARK: - Properties
 
-    private init() {}
+    static let shared = ProfileService()
 
     private let logger = Logger(label: "ProfileService")
 
@@ -12,14 +12,11 @@ final class ProfileService {
 
     private var task: URLSessionTask?
 
-    private func makeProfileRequest(token: String) -> URLRequest? {
-        guard let url = URL(string: Constants.defaultBaseURLString + "/me") else { return nil }
+    // MARK: - Initialization
 
-        var urlRequest = URLRequest(url: url)
-        urlRequest.httpMethod = HTTPMethod.get.rawValue
-        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return urlRequest
-    }
+    private init() {}
+
+    // MARK: - Public Methods
 
     func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
         assert(Thread.isMainThread)
@@ -72,5 +69,15 @@ final class ProfileService {
         task = nil
         profile = nil
     }
-}
 
+    // MARK: - Private Methods
+
+    private func makeProfileRequest(token: String) -> URLRequest? {
+        guard let url = URL(string: AuthConfiguration.standard.defaultBaseURLString + "/me") else { return nil }
+
+        var urlRequest = URLRequest(url: url)
+        urlRequest.httpMethod = HTTPMethod.get.rawValue
+        urlRequest.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return urlRequest
+    }
+}

@@ -2,56 +2,23 @@ import Foundation
 import Logging
 
 final class ImagesListService {
+    // MARK: - Properties
+
     static let shared = ImagesListService()
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
 
-    private init() {
-    }
-
     private let logger = Logger(label: "ImagesListService")
-
-    private var task: URLSessionTask?
 
     private(set) var photos: [Photo] = []
 
+    private var task: URLSessionTask?
     private var lastLoadedPage = 0
 
-    private func makeImagesListRequest(token: String) -> URLRequest? {
-        let urlString = Constants.defaultBaseURLString + "/photos"
+    // MARK: - Initialization
 
-        guard var urlComponents = URLComponents(string: urlString) else {
-            logger.error("makeImagesListRequest: failed to create URLComponents from '\(urlString)'")
-            return nil
-        }
-        urlComponents.queryItems = [
-            URLQueryItem(name: "page", value: "\(lastLoadedPage + 1)"),
-            URLQueryItem(name: "per_page", value: "\(Constants.photosPerPage)")
-        ]
+    private init() {}
 
-        guard let url = urlComponents.url else {
-            logger.error("makeImagesListRequest: failed to build URL from URLComponents: \(urlComponents)")
-            return nil
-        }
-        var request = URLRequest(url: url)
-        request.httpMethod = HTTPMethod.get.rawValue
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-        return request
-    }
-
-    private func makeChangeLikeRequest(token: String, photoId: String, isLike: Bool) -> URLRequest? {
-        let urlString = Constants.defaultBaseURLString + "/photos/\(photoId)/like"
-
-        guard let url = URL(string: urlString) else {
-            logger.error("makeChangeLikeRequest: failed to build URL from '\(urlString)'")
-            return nil
-        }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = isLike ? HTTPMethod.post.rawValue : HTTPMethod.delete.rawValue
-        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
-
-        return request
-    }
+    // MARK: - Public Methods
 
     func fetchPhotosNextPage() {
         assert(Thread.isMainThread)
@@ -139,5 +106,44 @@ final class ImagesListService {
         task = nil
         photos = []
         lastLoadedPage = 0
+    }
+
+    // MARK: - Private Methods
+
+    private func makeImagesListRequest(token: String) -> URLRequest? {
+        let urlString = AuthConfiguration.standard.defaultBaseURLString + "/photos"
+
+        guard var urlComponents = URLComponents(string: urlString) else {
+            logger.error("makeImagesListRequest: failed to create URLComponents from '\(urlString)'")
+            return nil
+        }
+        urlComponents.queryItems = [
+            URLQueryItem(name: "page", value: "\(lastLoadedPage + 1)"),
+            URLQueryItem(name: "per_page", value: "\(AuthConfiguration.standard.photosPerPage)")
+        ]
+
+        guard let url = urlComponents.url else {
+            logger.error("makeImagesListRequest: failed to build URL from URLComponents: \(urlComponents)")
+            return nil
+        }
+        var request = URLRequest(url: url)
+        request.httpMethod = HTTPMethod.get.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+        return request
+    }
+
+    private func makeChangeLikeRequest(token: String, photoId: String, isLike: Bool) -> URLRequest? {
+        let urlString = AuthConfiguration.standard.defaultBaseURLString + "/photos/\(photoId)/like"
+
+        guard let url = URL(string: urlString) else {
+            logger.error("makeChangeLikeRequest: failed to build URL from '\(urlString)'")
+            return nil
+        }
+
+        var request = URLRequest(url: url)
+        request.httpMethod = isLike ? HTTPMethod.post.rawValue : HTTPMethod.delete.rawValue
+        request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
+
+        return request
     }
 }
